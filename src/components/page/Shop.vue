@@ -53,13 +53,21 @@
 										{{shop.imgUrl}}
 									</template>
 								</td>
-								<td><button @click="edit($event,index)">编辑</button></td>
+								<td>
+									<template v-if="editable && flag==index">
+										<button @click="edit($event,index)">保存</button>
+									</template>
+									<template v-else>
+										<button @click="edit($event,index)">编辑</button>
+									</template>
+								</td>
 							</tr>
 						</template>
 						<tr>
 							<td><input type="checkbox" v-model="checkedAll" /></td>
 							<td><button @click="remove">删除</button></td>
-							<td colspan="4"></td>
+							<td><button @click="add">增加</button></td>
+							<td colspan="3"></td>
 						</tr>
 					</tbody>
 				</table>
@@ -110,6 +118,17 @@
 			}
 		},
 		methods: {
+			add () {
+				this.shops.push({
+					name: '',
+					price: '',
+					inventory: '',
+					imgUrl: '',
+					checked: false
+				});
+				this.editable = true;
+				this.flag = this.shops.length - 1;
+			},
 			edit (e,index) {
 				this.editable = !this.editable;
 				if(this.editable)

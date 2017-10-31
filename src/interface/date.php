@@ -8,5 +8,5 @@
 //	echo json_encode(mysql_fetch_array($query, MYSQL_ASSOC));
 //	echo strtotime("2017-10-22 20:03:11")*1000;
 	$_token = sha1(($_POST['user']).($_POST['pwd']).($_POST['timestamp']));
-//	echo '{"token":'.'"'.$_token.'"'.'}';
+	echo '{"token":'.'"'.$_token.'"'.'}';
 ?>

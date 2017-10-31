@@ -8,6 +8,11 @@
 				<label></label>
 				<input type="password" name="pwd" id="pwd" placeholder="Pwd" v-model="pwd" />
 				<label></label>
+				<!--<div>
+					<input type="text" name="code" id="code" v-model="code" placeholder="Code" />
+					<label></label>
+					<img :src="codeUrl" @click="toggle"/>
+				</div>-->
 				<input type="submit" value="login" />
 			</form>
 		</div>
@@ -22,6 +27,7 @@
 			return {
 				user: '',
 				pwd: '',
+				code: '',
 			}
 		},
 		store,
@@ -153,7 +159,6 @@
 					line-height: 50px;
 					padding: 0 20px;
 					box-sizing: border-box;
-					/*border-radius: 10px;*/
 					border-bottom: 1px solid #bfcbd9;
 					font-size: 20px;
 					color: #fff;
@@ -175,6 +180,28 @@
 						color: #fff;
 						border-color: rgba(255,255,255,0.6);
 						background: transparent;
+					}
+				}
+				&>div{
+					overflow: hidden;
+					margin-bottom: 30px;
+					&>#code{
+						width: 300px;
+						float: left;
+						background: rgba(255,255,255,0.2);
+						display: block;
+						height: 50px;
+						line-height: 50px;
+						padding: 0 20px;
+						box-sizing: border-box;
+						border-bottom: 1px solid #bfcbd9;
+						font-size: 20px;
+						color: #fff;
+						font-family: "microsoft yahei";
+					}
+					&>img{
+						cursor: pointer;
+						float: left;
 					}
 				}
 			}
