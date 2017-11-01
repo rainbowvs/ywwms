@@ -244,40 +244,47 @@
 						if(item.checked)
 							arr_id.push(item.id);
 					});
-					ajax({
-						url: "http://rainbowvs.com/yuewang/ywwms/interface/adminMsg.php",
-						overtime: 3000,
-						data: {
-							handle: 'del',
-							ids: arr_id.join(","),
-							token: localStorage.getItem("yw_token"),
-						},
-						complete (msg){
-							console.log(msg);
-						}
-					}).then(response => {
-						arr_id = '';
-						console.log(response);
-						if(response.type == 'success'){
-							let temp = [];
-							that.msgs.forEach((item) => {
-								if(!item.checked)
-									temp.push(item);
-							});
-							that.msgs = temp;
-							that.$store.commit('TOGGLE_WARNING',{
-								msg: response.msg,
-								state: true,
-							});
-						}else if(response.type == "error"){
-							that.$store.commit('TOGGLE_WARNING',{
-								msg: response.msg,
-								state: true,
-							});
-						}
-					}).catch(status => {
-						console.log(status);
-					});
+					if(arr_id.length != 0){
+						ajax({
+							url: "http://rainbowvs.com/yuewang/ywwms/interface/adminMsg.php",
+							overtime: 3000,
+							data: {
+								handle: 'del',
+								ids: arr_id.join(","),
+								token: localStorage.getItem("yw_token"),
+							},
+							complete (msg){
+								console.log(msg);
+							}
+						}).then(response => {
+							arr_id = '';
+							console.log(response);
+							if(response.type == 'success'){
+								let temp = [];
+								that.msgs.forEach((item) => {
+									if(!item.checked)
+										temp.push(item);
+								});
+								that.msgs = temp;
+								that.$store.commit('TOGGLE_WARNING',{
+									msg: response.msg,
+									state: true,
+								});
+							}else if(response.type == "error"){
+								that.$store.commit('TOGGLE_WARNING',{
+									msg: response.msg,
+									state: true,
+								});
+							}
+						}).catch(status => {
+							console.log(status);
+						});
+					}else{
+						that.$store.commit('TOGGLE_WARNING',{
+							msg: '没有选中任何信息',
+							state: true,
+						});
+					}
 				}
 			},
 			setConfirm (e) {
@@ -536,7 +543,7 @@
 										background-color: #324157;
 										color: #bfcbd9;;
 										&:hover{
-											color: #fff;
+											background-color: #48576a;
 										}
 										&:active{
 											color: #20a0ff;

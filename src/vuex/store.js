@@ -11,7 +11,7 @@ const state = {
 	},
 	confirmInfo: {
 		msg: '',
-		state: false,
+		state: true,
 	},
 	loading: false,
 };

@@ -28,7 +28,8 @@
 		$query = mysql_query(
 			"SELECT * 
 			   FROM ywms_admin_task 
-			  WHERE token='{$_GET['token']}'"
+			  WHERE token='{$_GET['token']}'
+		   ORDER BY id"
 		) or die("SQL 错误！");
 		
 		$list = array();

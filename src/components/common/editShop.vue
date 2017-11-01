@@ -2,7 +2,8 @@
 	<transition name="fade">
 		<div class="confirm" v-show="confirming">
 			<div class="container">
-				<p>{{msg}}</p>
+				<div class="content"></div>
+				<!--<slot></slot>-->
 				<div id="box">
 					<i id="no" class="fa fa-3x fa-close" @click="toggle($event)"></i>
 					<i id="ok" class="fa fa-3x fa-check" @click="toggle($event)"></i>
@@ -57,11 +58,15 @@
 		bottom: 0;
 		&>.container{
 			margin: 0 auto;
-			width: 400px;
-			height: 400px;
+			/*width: 400px;
+			height: 400px;*/
 			background: rgba(255,255,255,.8);
 			box-sizing: border-box;
 			padding: 100px 50px;
+			&>.content{
+				width: 400px;
+				height: 400px;
+			}
 			&>p{
 				margin: 25px auto;
 				height: 50px;

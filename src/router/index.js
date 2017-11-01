@@ -7,6 +7,8 @@ import Shop from '@/components/page/Shop'
 import Administrator from '@/components/page/Administrator'
 import User from '@/components/page/User'
 import Login from '@/components/page/Login'
+import editShop from '@/components/common/editShop'
+
 
 Vue.use(Router)
 
@@ -45,9 +47,14 @@ export default new Router({
       ]
     },
     {
-		path: '/login',
+			path: '/login',
 	    name: 'Login',
 	    component: Login,
-	},
+		},
+		{
+			path: '/editshop',
+      name: 'editShop',
+      component: editShop,
+		},
   ]
 })
