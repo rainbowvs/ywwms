@@ -60,7 +60,7 @@
 				</div>
 			</div>
 		</div>
-		<my-dialog @click.native="setConfirm($event)"></my-dialog>
+		<my-dialog @click.native="setConfirm($event)"><span class="wtf">1</span></my-dialog>
 	</div>
 </template>
 
@@ -405,6 +405,9 @@
 <style lang="scss" scoped>
 	.index{
 		width: 100%;
+		&>.confirm{
+			background-color: #fff;
+		}
 		&>h2{
 			border-left: 4px solid #324157;
 			padding-left: 10px;

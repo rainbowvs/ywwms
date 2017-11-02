@@ -4,6 +4,7 @@
 			<div class="container">
 				<i class="fa fa-3x fa-comment"></i>
 				<p>{{msg}}</p>
+				<slot></slot>
 				<div id="box">
 					<i id="no" class="fa fa-3x fa-close" @click="toggle($event)"></i>
 					<i id="ok" class="fa fa-3x fa-check" @click="toggle($event)"></i>
