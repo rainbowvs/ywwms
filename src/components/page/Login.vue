@@ -45,22 +45,22 @@
 				if(that.user == '' || that.pwd == ''){
 					that.$store.commit('TOGGLE_WARNING',{
 						msg: '账号或密码不能为空',
-						state: true,
+						visibility: true,
 					});
 				}else if(that.user.length < 6){
 					that.$store.commit('TOGGLE_WARNING',{
 						msg: '账号不得小于6位',
-						state: true,
+						visibility: true,
 					});
 				}else if(that.pwd < 6){
 					that.$store.commit('TOGGLE_WARNING',{
 						msg: '密码不得小于6位',
-						state: true,
+						visibility: true,
 					});
 				}else if(that.validate() == 'false'){
 					that.$store.commit('TOGGLE_WARNING',{
 						msg: '账号不能包含敏感字符',
-						state: true,
+						visibility: true,
 					});
 				}else{
 					ajax({
@@ -84,14 +84,14 @@
 						that.$store.commit('TOGGLE_LOADING',false);
 						that.$store.commit('TOGGLE_WARNING',{
 							msg: response.msg,
-							state: true,
+							visibility: true,
 						});
 						if(response.type == 'success'){
 							localStorage.setItem('yw_token',response.token);
 							setTimeout(() => {
 								that.$store.commit('TOGGLE_WARNING',{
 									msg: '',
-									state: false,
+									visibility: false,
 								});
 								that.$router.push({ path: '/', query: { token: response.token}});
 							},1000);

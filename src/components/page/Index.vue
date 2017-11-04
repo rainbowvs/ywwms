@@ -60,7 +60,7 @@
 				</div>
 			</div>
 		</div>
-		<my-dialog @click.native="setConfirm($event)"><span class="wtf">1</span></my-dialog>
+		<my-dialog @click.native="setConfirm($event)"></my-dialog>
 	</div>
 </template>
 
@@ -102,7 +102,7 @@
 				}else if(response.type == "error"){
 					that.$store.commit('TOGGLE_WARNING',{
 						msg: response.msg,
-						state: true,
+						visibility: true,
 					});
 				}
 				console.log(that.todos);
@@ -127,7 +127,7 @@
 				}else if(response.type == "error"){
 					that.$store.commit('TOGGLE_WARNING',{
 						msg: response.msg,
-						state: true,
+						visibility: true,
 					});
 				}
 			}).catch(status => {
@@ -139,17 +139,17 @@
 				if(this.task == ''){
 					this.$store.commit('TOGGLE_WARNING',{
 						msg: '任务不能为空',
-						state: true,
+						visibility: true,
 					});
 				}else if(this.todos.length == 10){
 					this.$store.commit('TOGGLE_WARNING',{
 						msg: '最多只能同时存在10个任务',
-						state: true,
+						visibility: true,
 					});
 				}else if(this.todos.find((item) => item.content == this.task)){
 					this.$store.commit('TOGGLE_WARNING',{
 						msg: '已有相同的任务',
-						state: true,
+						visibility: true,
 					});
 				}else{
 					let that = this;
@@ -170,13 +170,13 @@
 							that.todos.push({id: response.task.id,content: response.task.content,cdate: response.task.cdate,focus: false});
 							that.$store.commit('TOGGLE_WARNING',{
 								msg: response.msg,
-								state: true,
+								visibility: true,
 							});
 							that.task = '';
 						}else if(response.type == "error"){
 							that.$store.commit('TOGGLE_WARNING',{
 								msg: response.msg,
-								state: true,
+								visibility: true,
 							});
 						}
 					}).catch( status => {
@@ -186,9 +186,9 @@
 			},
 			removeCtd (e,index) {
 				this.eventType = 'removeTodo';
-				this.$store.commit('TOGGLE_CONFIRMING',{
+				this.$store.commit('TOGGLE_DIALOGING',{
 					msg: '确认要删除该任务?',
-					state: true,
+					visibility: true,
 				});
 				this.focus = index;
 			},
@@ -211,13 +211,13 @@
 							that.todos.splice(that.focus,1);
 							that.$store.commit('TOGGLE_WARNING',{
 								msg: response.msg,
-								state: true,
+								visibility: true,
 							});
 							that.focus = null;
 						}else if(response.type == "error"){
 							that.$store.commit('TOGGLE_WARNING',{
 								msg: response.msg,
-								state: true,
+								visibility: true,
 							});
 						}
 					}).catch(status => {
@@ -230,9 +230,9 @@
 			removeCm () {
 				if(this.msgs.length != 0){
 					this.eventType = 'removeMsg';
-					this.$store.commit('TOGGLE_CONFIRMING',{
+					this.$store.commit('TOGGLE_DIALOGING',{
 						msg: '确认要删除选中的信息?',
-						state: true,
+						visibility: true,
 					});
 				}
 			},
@@ -257,7 +257,7 @@
 								console.log(msg);
 							}
 						}).then(response => {
-							arr_id = '';
+							arr_id = [];
 							console.log(response);
 							if(response.type == 'success'){
 								let temp = [];
@@ -268,12 +268,12 @@
 								that.msgs = temp;
 								that.$store.commit('TOGGLE_WARNING',{
 									msg: response.msg,
-									state: true,
+									visibility: true,
 								});
 							}else if(response.type == "error"){
 								that.$store.commit('TOGGLE_WARNING',{
 									msg: response.msg,
-									state: true,
+									visibility: true,
 								});
 							}
 						}).catch(status => {
@@ -282,7 +282,7 @@
 					}else{
 						that.$store.commit('TOGGLE_WARNING',{
 							msg: '没有选中任何信息',
-							state: true,
+							visibility: true,
 						});
 					}
 				}
@@ -406,7 +406,7 @@
 	.index{
 		width: 100%;
 		&>.confirm{
-			background-color: #fff;
+			/*background-color: #fff;*/
 		}
 		&>h2{
 			border-left: 4px solid #324157;

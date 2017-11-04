@@ -23,13 +23,13 @@
 			show (e) {
 				this.$store.commit('TOGGLE_WARNING',{
 					msg: '',
-					state: false,
+					visibility: false,
 				});
 			}
 		},
 		computed: {
 			warning () {
-				return this.$store.state.warnInfo['state'];
+				return this.$store.state.warnInfo['visibility'];
 			},
 			msg () {
 				return this.$store.state.warnInfo['msg'];

@@ -7,13 +7,14 @@ const state = {
 	currentPage: 0,
 	warnInfo: {
 		msg: '',
-		state: false,
+		visibility: false,
 	},
-	confirmInfo: {
+	dialogInfo: {
 		msg: '',
-		state: true,
+		visibility: false,
 	},
 	loading: false,
+	editing: false,
 };
 
 const mutations = {
@@ -23,18 +24,21 @@ const mutations = {
 	},
 	TOGGLE_WARNING (state,opt) {
 		state.warnInfo['msg'] = opt.msg;
-		state.warnInfo['state'] = opt.state;
+		state.warnInfo['visibility'] = opt.visibility;
 	},
-	TOGGLE_CONFIRMING (state,opt) {
-		state.confirmInfo['msg'] = opt.msg;
-		state.confirmInfo['state'] = opt.state;
+	TOGGLE_DIALOGING (state,opt) {
+		state.dialogInfo['msg'] = opt.msg;
+		state.dialogInfo['visibility'] = opt.visibility;
 	},
-	SET_CONFIRMING (state,bool) {
-		state.confirmInfo['returnValue'] = bool;
+	SET_DIALOGING (state,bool) {
+		state.dialogInfo['returnValue'] = bool;
 	},
 	TOGGLE_LOADING (state,bool) {
 		state.loading = bool;
-	}
+	},
+	SET_EDITING (state,bool) {
+		state.editing = bool;
+	},
 };
 
 export default new Vuex.Store({

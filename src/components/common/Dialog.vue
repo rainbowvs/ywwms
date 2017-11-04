@@ -1,11 +1,10 @@
 <template>
 	<transition name="fade">
-		<div class="confirm" v-show="confirming">
+		<div class="dialog" v-show="dialoging">
 			<div class="container">
 				<i class="fa fa-3x fa-comment"></i>
 				<p>{{msg}}</p>
-				<slot></slot>
-				<div id="box">
+				<div id="btns">
 					<i id="no" class="fa fa-3x fa-close" @click="toggle($event)"></i>
 					<i id="ok" class="fa fa-3x fa-check" @click="toggle($event)"></i>
 				</div>
@@ -25,25 +24,25 @@
 		store,
 		methods: {
 			toggle () {
-				this.$store.commit('TOGGLE_CONFIRMING',{
+				this.$store.commit('TOGGLE_DIALOGING',{
 					msg: '',
-					state: false,
+					visibility: false,
 				});
 			}
 		},
 		computed: {
-			confirming () {
-				return this.$store.state.confirmInfo['state'];
+			dialoging () {
+				return this.$store.state.dialogInfo['visibility'];
 			},
 			msg () {
-				return this.$store.state.confirmInfo['msg'];
+				return this.$store.state.dialogInfo['msg'];
 			}
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
-	.confirm{
+	.dialog{
 		text-align: center;
 		display: flex;
 		flex-direction: column;
@@ -71,7 +70,7 @@
 				color: #000;
 				font-size: 20px;
 			}
-			&>#box{
+			&>#btns{
 				display: flex;
 				flex-direction: row;
 				justify-content: space-around;

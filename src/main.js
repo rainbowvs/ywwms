@@ -8,7 +8,7 @@ import Warn from '@/components/common/Warn';
 
 Vue.component('my-loading',Loading);
 Vue.component('my-warn',Warn);
-Vue.config.productionTip = false;
+Vue.config.productionTip = true;
 
 /* eslint-disable no-new */
 new Vue({
