@@ -14,7 +14,6 @@ const state = {
 		visibility: false,
 	},
 	loading: false,
-	editing: false,
 };
 
 const mutations = {
@@ -23,21 +22,11 @@ const mutations = {
 		window.localStorage.setItem('currentPage',index);
 	},
 	TOGGLE_WARNING (state,opt) {
-		state.warnInfo['msg'] = opt.msg;
 		state.warnInfo['visibility'] = opt.visibility;
-	},
-	TOGGLE_DIALOGING (state,opt) {
-		state.dialogInfo['msg'] = opt.msg;
-		state.dialogInfo['visibility'] = opt.visibility;
-	},
-	SET_DIALOGING (state,bool) {
-		state.dialogInfo['returnValue'] = bool;
+		state.warnInfo['msg'] = opt.msg;
 	},
 	TOGGLE_LOADING (state,bool) {
 		state.loading = bool;
-	},
-	SET_EDITING (state,bool) {
-		state.editing = bool;
 	},
 };
 

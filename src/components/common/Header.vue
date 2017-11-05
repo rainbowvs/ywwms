@@ -42,13 +42,13 @@
 				else if(response.type == "error"){
 					this.$store.commit('TOGGLE_WARNING',{
 						msg: response.msg,
-						state: true,
+						visibility: true,
 					});
 					localStorage.removeItem("yw_token");
 					setTimeout(()=>{
 						this.$store.commit('TOGGLE_WARNING',{
 							msg: '',
-							state: false,
+							visibility: false,
 						});
 						this.$router.push('/login');
 					},1000);
@@ -82,14 +82,16 @@
 			logout (e) {
 				this.downed = false;
 				localStorage.removeItem("yw_token");
+				this.$store.commit('UPDATE_CURRENTPAGE',0);
+				localStorage.removeItem("currentPage");
 				this.$store.commit('TOGGLE_WARNING',{
 					msg: '退出成功',
-					state: true,
+					visibility: true,
 				});
 				setTimeout(() => {
 					this.$store.commit('TOGGLE_WARNING',{
 						msg: '',
-						state: false,
+						visibility: false,
 					});
 					this.$router.push('/login');
 				},1000);

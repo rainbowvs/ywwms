@@ -1,12 +1,12 @@
 <template>
 	<transition name="fade">
-		<div class="dialog" v-show="visibility">
+		<div class="edit" v-show="visible">
 			<div class="container">
 				<div class="header">
-					<i class="fa fa-3x fa-comment"></i>
+					<slot name="header"></slot>
 				</div>
 				<div class="body">
-					<p>{{msg}}</p>
+					<slot name="body"></slot>
 				</div>
 				<div class="footer">
 					<i id="no" class="fa fa-3x fa-close" @click="close"></i>
@@ -21,29 +21,27 @@
 	export default{
 		data () {
 			return {
-				visibility: false,
-				msg: '',
+				visible: false,
+				type: null,
 			}
 		},
 		methods: {
 			close () {
-				this.visibility = false;
-				this.msg = '';
+				this.visible = false;
 			},
-			open (msg) {
-				this.visibility = true;
-				this.msg = msg;
-				
+			open (type) {
+				this.visible = true;
+				this.type = type;
 			},
 			ok () {
-				this.$emit('sure',true);
+				this.$emit('sure',this.type);
 			},
 		},
 	}
 </script>
 
 <style lang="scss" scoped>
-	.dialog{
+	.edit{
 		text-align: center;
 		display: flex;
 		flex-direction: column;
@@ -52,36 +50,25 @@
 		height: 100%;
 		background: rgba(0,0,0,.5);
 		position: fixed;
-		z-index: 100;
+		z-index: 1000;
 		left: 0;
 		top: 0;
 		right: 0;
 		bottom: 0;
 		&>.container{
 			margin: 0 auto;
-			width: 500px;
-			height: 400px;
-			background: rgba(255,255,255,.8);
-			box-sizing: border-box;
-			padding: 100px 50px;
-			position: relative;
+			background: #fff;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
 			&>.header{
-				position: absolute;
-				left: 0;
-				right: 0;
-				top: 40px;
+				padding: 20px 0;
 			}
 			&>.body{
-				&>p{
-					line-height: 200px;
-					font-size: 20px;
-				}
+				padding: 0 50px;
 			}
 			&>.footer{
-				position: absolute;
-				left: 0;
-				right: 0;
-				bottom: 40px;
+				padding: 20px 0;
 				display: flex;
 				flex-direction: row;
 				justify-content: space-around;

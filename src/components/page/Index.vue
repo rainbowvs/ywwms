@@ -60,13 +60,12 @@
 				</div>
 			</div>
 		</div>
-		<my-dialog @click.native="setConfirm($event)"></my-dialog>
+		<my-dialog ref="dialog" @sure="dOk"></my-dialog>
 	</div>
 </template>
 
 <script>
 	import {ajax} from '../../../static/js/ajax.js';
-	import Dialog from '@/components/common/Dialog';
 	import echarts from 'echarts';
 	import store from '@/vuex/store';
 	export default{
@@ -186,122 +185,97 @@
 			},
 			removeCtd (e,index) {
 				this.eventType = 'removeTodo';
-				this.$store.commit('TOGGLE_DIALOGING',{
-					msg: '确认要删除该任务?',
-					visibility: true,
-				});
+				this.$refs.dialog.open('确认要删除选中的任务?');
 				this.focus = index;
 			},
 			removeTodo (value) {
-				if(value){
-					let that = this;
+				let that = this;
+				ajax({
+					url: "http://rainbowvs.com/yuewang/ywwms/interface/adminTask.php",
+					overtime: 3000,
+					data: {
+						handle: 'del',
+						id: that.todos[that.focus].id,
+						token: localStorage.getItem("yw_token"),
+					},
+					complete (msg){
+						console.log(msg);
+					}
+				}).then(response => {
+					if(response.type == 'success'){
+						that.todos.splice(that.focus,1);
+						this.$refs.dialog.close();
+						that.focus = null;
+					}else if(response.type == "error"){
+						//
+					}
+					that.$store.commit('TOGGLE_WARNING',{
+						msg: response.msg,
+						visibility: true,
+					});
+				}).catch(status => {
+					console.log(status);
+				});
+			},
+			removeCm () {
+				if(this.msgs.length != 0){
+					this.eventType = 'removeMsg';
+					this.$refs.dialog.open('确认要删除选中的信息?');
+				}
+			},
+			removeMsg (value) {
+				let that = this;
+				let arr_id = [];
+				that.msgs.forEach((item) => {
+					if(item.checked)
+						arr_id.push(item.id);
+				});
+				if(arr_id.length != 0){
 					ajax({
-						url: "http://rainbowvs.com/yuewang/ywwms/interface/adminTask.php",
+						url: "http://rainbowvs.com/yuewang/ywwms/interface/adminMsg.php",
 						overtime: 3000,
 						data: {
 							handle: 'del',
-							id: that.todos[that.focus].id,
+							ids: arr_id.join(","),
 							token: localStorage.getItem("yw_token"),
 						},
 						complete (msg){
 							console.log(msg);
 						}
 					}).then(response => {
+						arr_id = [];
+						console.log(response);
 						if(response.type == 'success'){
-							that.todos.splice(that.focus,1);
-							that.$store.commit('TOGGLE_WARNING',{
-								msg: response.msg,
-								visibility: true,
+							let temp = [];
+							that.msgs.forEach((item) => {
+								if(!item.checked)
+									temp.push(item);
 							});
-							that.focus = null;
+							that.msgs = temp;
+							that.$refs.dialog.close();
 						}else if(response.type == "error"){
-							that.$store.commit('TOGGLE_WARNING',{
-								msg: response.msg,
-								visibility: true,
-							});
+							//
 						}
+						that.$store.commit('TOGGLE_WARNING',{
+							msg: response.msg,
+							visibility: true,
+						});
 					}).catch(status => {
 						console.log(status);
 					});
 				}else{
-					this.focus = null;
-				}
-			},
-			removeCm () {
-				if(this.msgs.length != 0){
-					this.eventType = 'removeMsg';
-					this.$store.commit('TOGGLE_DIALOGING',{
-						msg: '确认要删除选中的信息?',
+					that.$refs.dialog.close();
+					that.$store.commit('TOGGLE_WARNING',{
+						msg: '没有选中任何信息',
 						visibility: true,
 					});
 				}
 			},
-			removeMsg (value) {
-				if(value){
-					let that = this;
-					let arr_id = [];
-					that.msgs.forEach((item) => {
-						if(item.checked)
-							arr_id.push(item.id);
-					});
-					if(arr_id.length != 0){
-						ajax({
-							url: "http://rainbowvs.com/yuewang/ywwms/interface/adminMsg.php",
-							overtime: 3000,
-							data: {
-								handle: 'del',
-								ids: arr_id.join(","),
-								token: localStorage.getItem("yw_token"),
-							},
-							complete (msg){
-								console.log(msg);
-							}
-						}).then(response => {
-							arr_id = [];
-							console.log(response);
-							if(response.type == 'success'){
-								let temp = [];
-								that.msgs.forEach((item) => {
-									if(!item.checked)
-										temp.push(item);
-								});
-								that.msgs = temp;
-								that.$store.commit('TOGGLE_WARNING',{
-									msg: response.msg,
-									visibility: true,
-								});
-							}else if(response.type == "error"){
-								that.$store.commit('TOGGLE_WARNING',{
-									msg: response.msg,
-									visibility: true,
-								});
-							}
-						}).catch(status => {
-							console.log(status);
-						});
-					}else{
-						that.$store.commit('TOGGLE_WARNING',{
-							msg: '没有选中任何信息',
-							visibility: true,
-						});
-					}
-				}
-			},
-			setConfirm (e) {
-				if(e.target.id == 'ok'){
-					this.returnValue = true;
-					if(this.eventType == 'removeTodo')
-						this.removeTodo(this.returnValue);
-					else if(this.eventType == 'removeMsg')
-						this.removeMsg(this.returnValue);
-				}else if(e.target.id == 'no'){
-					this.returnValue = false;
-					if(this.eventType == 'removeTodo')
-						this.removeTodo(this.returnValue);
-					else if(this.eventType == 'removeMsg')
-						this.removeMsg(this.returnValue);
-				}
-				this.returnValue = null;
+			dOk (e) {
+				if(this.eventType == 'removeTodo')
+					this.removeTodo();
+				else if(this.eventType == 'removeMsg')
+					this.removeMsg();
 			}
 		},
 		mounted () {
@@ -396,18 +370,12 @@
 				}
 			}
 		},
-		components: {
-			'my-dialog': Dialog,
-		}
 	}
 </script>
 
 <style lang="scss" scoped>
 	.index{
 		width: 100%;
-		&>.confirm{
-			/*background-color: #fff;*/
-		}
 		&>h2{
 			border-left: 4px solid #324157;
 			padding-left: 10px;

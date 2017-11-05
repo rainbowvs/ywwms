@@ -2,7 +2,7 @@
 	<transition name="fade">
 		<div class="loading" v-show="loading">
 			<div class="container">
-				<i class="fa fa-refresh fa-spin fa-3x fa-fw margin-top"></i>
+				<i class="fa fa-refresh fa-spin fa-4x fa-fw margin-top"></i>
 			</div>
 		</div>
 	</transition>
@@ -30,7 +30,7 @@
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
-		z-index: 9999;
+		z-index: 10000;
 		width: 100%;
 		height: 100%;
 		position: fixed;
@@ -44,9 +44,9 @@
 			flex-direction: column;
 			justify-content: center;
 			margin: 0 auto;
-			width: 300px;
-			height: 300px;
-			line-height: 300px;
+			width: 200px;
+			height: 200px;
+			line-height: 200px;
 			background-color: rgba(255,255,255,.8);
 			&>i{
 				display: block;

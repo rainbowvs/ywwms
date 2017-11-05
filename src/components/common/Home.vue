@@ -43,7 +43,6 @@
 		    top: 66px;
 		    bottom: 0;
 		    margin: 25px 40px;
-			/*padding: 25px 40px;*/
 		    overflow-y: visible;
 		    background-color: #f0f3f4;
 		}

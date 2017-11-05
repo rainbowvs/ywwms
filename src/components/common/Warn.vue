@@ -2,9 +2,15 @@
 	<transition name="fade">
 		<div class="warn" v-show="warning">
 			<div class="container">
-				<i class="fa fa-3x fa-warning"></i>
-				<p>{{msg}}</p>
-				<i id="close" class="fa fa-3x fa-close" @click="show($event)"></i>
+				<div class="header">
+					<i class="fa fa-3x fa-warning"></i>
+				</div>
+				<div class="body">
+					<p>{{msg}}</p>
+				</div>
+				<div class="footer">
+					<i id="close" class="fa fa-3x fa-close" @click="show($event)"></i>
+				</div>
 			</div>
 		</div>
 	</transition>
@@ -55,22 +61,35 @@
 		bottom: 0;
 		&>.container{
 			margin: 0 auto;
-			width: 400px;
+			width: 500px;
 			height: 400px;
 			background: rgba(255,255,255,.8);
 			box-sizing: border-box;
 			padding: 100px 50px;
-			&>p{
-				margin: 25px auto;
-				height: 50px;
-				color: #000;
-				font-size: 20px;
+			position: relative;
+			&>.header{
+				position: absolute;
+				left: 0;
+				right: 0;
+				top: 40px;
 			}
-			&>#close{
-				margin-top: 50px;
-				&:hover{
+			&>.body{
+				&>p{
+					line-height: 200px;
+					font-size: 20px;
+				}
+			}
+			&>.footer{
+				position: absolute;
+				left: 0;
+				right: 0;
+				bottom: 40px;
+				text-align: center;
+				&>#close{
 					cursor: pointer;
-					color: darkred;
+					&:hover{
+						color: darkred;
+					}
 				}
 			}
 		}

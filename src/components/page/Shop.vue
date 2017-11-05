@@ -48,8 +48,13 @@
 				</table>
 			</div>
 		</div>
-		<my-edit @click.native="btns($event)">
-			<h1 slot="header">修改商品</h1>
+		<my-edit ref="edit" @sure="eOk">
+			<template v-if="type == 'edit'">
+				<h1 slot="header">修改商品</h1>
+			</template>
+			<template v-else>
+				<h1 slot="header">增加商品</h1>
+			</template>
 			<form slot="body">
 				<ul>
 					<li>
@@ -91,7 +96,7 @@
 				</ul>
 			</form>
 		</my-edit>
-		<my-dialog @click.native="choose($event)"></my-dialog>
+		<my-dialog ref="dialog" @sure="dOk"></my-dialog>
 	</div>
 </template>
 
@@ -99,18 +104,17 @@
 	import store from '@/vuex/store';
 	import {ajax} from '../../../static/js/ajax.js';
 	import Edit from '@/components/common/Edit'
-	import Dialog from '@/components/common/Dialog';
 	export default{
 		data () {
 			return {
 				current: {},
 				shops: [],
 				focus: null,
+				type: '',
 			}
 		},
 		store,
 		created () {
-			console.log(this.shops[0]);
 			let that = this;
 			//拉取商品信息
 			ajax({
@@ -153,7 +157,6 @@
 		},
 		components: {
 			'my-edit': Edit,
-			'my-dialog': Dialog,
 		},
 		computed: {
 			checkedAll: {
@@ -185,12 +188,9 @@
 			}
 		},
 		methods: {
-			btns (e) {
-				if(e.target.id == "no"){
-					this.$store.commit('SET_EDITING',false);
-					this.current = {};
-				}else if(e.target.id == "ok"){
-					let that = this;
+			eOk (type) {
+				let that = this;
+				if(type == 'add'){
 					//拉取商品信息
 					ajax({
 						url: "http://rainbowvs.com/yuewang/ywwms/interface/shop.php",
@@ -228,91 +228,84 @@
 								cdate: response.shop.cdate,
 								checked: false
 							});
-							this.$store.commit('SET_EDITING',false);
-							that.$store.commit('TOGGLE_WARNING',{
-								msg: response.msg,
-								visibility: true,
-							});
+							that.$refs.edit.close();
 						}else if(response.type == "error"){
-							that.$store.commit('TOGGLE_WARNING',{
-								msg: response.msg,
-								visibility: true,
-							});
+							//服务器返回其他原因
 						}
-						console.log();
+						that.$store.commit('TOGGLE_WARNING',{
+							msg: response.msg,
+							visibility: true,
+						});
 					}).catch(status => {
 						console.log(status);
 					});
+				}else if(type == 'edit'){
+					//修改数据[接口未完成]
+					console.log("Update数据[接口未完成]");
 				}
 			},
 			add () {
-				this.$store.commit('SET_EDITING',true);
+				this.current = {};//清空edit页面数据
+				this.type = 'add';
+				this.$refs.edit.open('add');
 			},
 			edit (e,index) {
 				this.focus = index;
 				this.current = this.shops[this.focus];
-				this.$store.commit('SET_EDITING',true);
+				this.type = 'edit';
+				this.$refs.edit.open('edit');
 			},
 			remove () {
 				if(this.shops.length != 0){
-					this.$store.commit('TOGGLE_DIALOGING',{
-						msg: '确认要删除选中的商品?',
-						visibility: true,
-					});
+					this.$refs.dialog.open('确认要删除选中的商品?');
 				}
 			},
-			choose (e) {
-				if(e.target.id == "no"){
-					this.$store.commit('SET_EDITING',false);
-					this.current = {};
-				}else if(e.target.id == "ok"){
-					let that = this;
-					let arr_id = [];
-					that.shops.forEach((item) => {
-						if(item.checked)
-							arr_id.push(item.id);
-					});
-					if(arr_id.length != 0){
-						ajax({
-							url: "http://rainbowvs.com/yuewang/ywwms/interface/shop.php",
-							overtime: 3000,
-							data: {
-								handle: 'del',
-								ids: arr_id.join(","),
-								token: localStorage.getItem("yw_token"),
-							},
-							complete (msg){
-								console.log(msg);
-							}
-						}).then(response => {
-							arr_id = [];
-							console.log(response);
-							if(response.type == 'success'){
-								let temp = [];
-								that.shops.forEach((item) => {
-									if(!item.checked)
-										temp.push(item);
-								});
-								that.shops = temp;
-								that.$store.commit('TOGGLE_WARNING',{
-									msg: response.msg,
-									visibility: true,
-								});
-							}else if(response.type == "error"){
-								that.$store.commit('TOGGLE_WARNING',{
-									msg: response.msg,
-									visibility: true,
-								});
-							}
-						}).catch(status => {
-							console.log(status);
-						});
-					}else{
+			dOk () {
+				let that = this;
+				let arr_id = [];
+				that.shops.forEach((item) => {
+					if(item.checked)
+						arr_id.push(item.id);
+				});
+				if(arr_id.length != 0){
+					ajax({
+						url: "http://rainbowvs.com/yuewang/ywwms/interface/shop.php",
+						overtime: 3000,
+						data: {
+							handle: 'del',
+							ids: arr_id.join(","),
+							token: localStorage.getItem("yw_token"),
+						},
+						complete (msg){
+							console.log(msg);
+						}
+					}).then(response => {
+						arr_id = [];
+						console.log(response);
+						if(response.type == 'success'){
+							let temp = [];
+							that.shops.forEach((item) => {
+								if(!item.checked)
+									temp.push(item);
+							});
+							that.shops = temp;
+							that.$refs.dialog.close();
+						}else if(response.type == "error"){
+							//服务器返回其他原因
+						}
 						that.$store.commit('TOGGLE_WARNING',{
-							msg: '没有选中任何商品',
+							msg: response.msg,
 							visibility: true,
 						});
-					}
+					}).catch(status => {
+						console.log(status);
+					});
+				}else{
+					that.$store.commit('TOGGLE_WARNING',{
+						msg: '没有选中任何商品',
+						visibility: true,
+					});
+					that.$refs.dialog.close();
 				}
 			},
 		}
@@ -403,19 +396,14 @@
 			.body{
 				max-height: 500px;
 				overflow-y: auto;
-				&>h1{
-					margin-bottom: 20px;
-					text-align: center;
-				}
 				&>form{
 					&>ul{
 						&>li{
-							padding: 0 50px;
 							margin: 8px auto;
 							line-height: 40px;
 							overflow: hidden;
 							&>label{
-								height: 40px;
+								line-height: 38px;
 								box-sizing: border-box;
 								border: 1px solid #d8dce5;
 								border-right: 0;
@@ -429,7 +417,7 @@
 							    background-color: #fff;
 							    border: 1px solid #d8dce5;
 							    box-sizing: border-box;
-							    color: #5a5e66;
+							    color: #000;
 							    display: inline-block;
 							    height: 40px;
 							    line-height: 1;
@@ -448,6 +436,6 @@
 		}
 	}
 	input::-webkit-input-placeholder{
-	    color: #ccc;
+	    color: #aaa;
 	}
 </style>
