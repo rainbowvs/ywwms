@@ -150,7 +150,7 @@
 						visibility: true,
 					});
 				}
-				console.log();
+				console.log(response);
 			}).catch(status => {
 				console.log(status);
 			});
@@ -191,7 +191,7 @@
 			eOk (type) {
 				let that = this;
 				if(type == 'add'){
-					//拉取商品信息
+					//提交新增商品信息
 					ajax({
 						url: "http://rainbowvs.com/yuewang/ywwms/interface/shop.php",
 						overtime: 3000,
@@ -240,8 +240,42 @@
 						console.log(status);
 					});
 				}else if(type == 'edit'){
-					//修改数据[接口未完成]
-					console.log("Update数据[接口未完成]");
+					//提交修改商品信息
+					ajax({
+						url: "http://rainbowvs.com/yuewang/ywwms/interface/shop.php",
+						overtime: 3000,
+						data: {
+							handle: 'update',
+							id: that.current.id,
+							typeId: that.current.typeId,
+							name: that.current.name,
+							price: that.current.price,
+							purchased: that.current.purchased,
+							inventory: that.current.inventory,
+							color: that.current.color,
+							poster: that.current.poster,
+							pic1: that.current.pic1,
+							pic2: that.current.pic2,
+							cdate: that.current.cdate,
+							token: localStorage.getItem("yw_token"),
+						},
+						complete (msg){
+							console.log(msg);
+						}
+					}).then(response => {
+						console.log(response);
+						if(response.type == 'success'){
+							that.$refs.edit.close();
+						}else if(response.type == "error"){
+							//服务器返回其他原因
+						}
+						that.$store.commit('TOGGLE_WARNING',{
+							msg: response.msg,
+							visibility: true,
+						});
+					}).catch(status => {
+						console.log(status);
+					});
 				}
 			},
 			add () {
