@@ -122,7 +122,7 @@
 				overtime: 3000,
 				data: {
 					handle: 'get',
-//					page: 2,
+//					page: 2,//商品分页
 					token: localStorage.getItem("yw_token"),
 				},
 				complete (msg){
