@@ -53,7 +53,8 @@
 		echo json_encode(array(
 			"type" => "success",
 			"msg" => "商品获取成功",
-			"shops" => $list
+			"shops" => $list,
+			"totalPage" => $totalPage
 		),JSON_UNESCAPED_UNICODE);
 	}else if($_GET['handle'] == 'update'){
 		$query = mysql_query(
