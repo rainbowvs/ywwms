@@ -46,6 +46,22 @@
 						</tr>
 					</tbody>
 				</table>
+				<div class="pagination">
+					<ul>
+						<li class="prev" @click="toPrev($event)">&lt;</li>
+						<li v-for="page in pages" :class="{active:currentPage==page}" @click="selectPage($event,page)">{{page}}</li>
+						<li class="dot">...</li>
+						<li class="next" @click="toNext($event)">&gt;</li>
+						<template v-if="currentPage<totalPage">
+							<p>共 {{totalPage}} 页，到第 <input ref="inputPage" type="number" :value="toPage" :max="totalPage" min="1"/> 页</p>
+							<button @click="submitPage">确定</button>
+						</template>
+						<template v-else>
+							<p>共 {{totalPage}} 页，到第 <input ref="inputPage" type="number" :value="currentPage" :max="totalPage" min="1"/> 页</p>
+							<button @click="submitPage">确定</button>
+						</template>
+					</ul>
+				</div>
 			</div>
 		</div>
 		<my-edit ref="edit" @sure="eOk">
@@ -110,6 +126,9 @@
 				current: {},
 				shops: [],
 				focus: null,
+				currentPage: 1,
+				totalPage: 1,
+				pageSize: 5,
 				type: '',
 			}
 		},
@@ -145,13 +164,13 @@
 							cdate: response.shops[i].cdate,
 							checked: false
 						});
+					that.totalPage = response.totalPage;
 				}else if(response.type == "error"){
 					that.$store.commit('TOGGLE_WARNING',{
 						msg: response.msg,
 						visibility: true,
 					});
 				}
-				console.log(response);
 			}).catch(status => {
 				console.log(status);
 			});
@@ -160,6 +179,31 @@
 			'my-edit': Edit,
 		},
 		computed: {
+			toPage () {
+				return +this.currentPage+1;
+			},
+			pages () {
+				let left = 1,
+					right = this.totalPage,
+					movePoint = Math.ceil(this.pageSize / 2),
+					pages = [];
+				if (this.currentPage > movePoint && this.currentPage < this.totalPage - movePoint + 1) {
+					left = this.pageSize % 2 === 0 ? this.currentPage - movePoint : this.currentPage - movePoint + 1;
+					right = this.currentPage + movePoint - 1;
+				} else if (this.currentPage <= movePoint) {
+					left = 1;
+					right = this.pageSize;
+				} else {
+					left = this.totalPage - this.pageSize + 1;
+					right = this.totalPage;
+				}
+
+				while (left <= right) {
+					pages.push(left);
+					left++;
+				}
+				return pages;
+			},
 			checkedAll: {
 				get () {
 					if(this.checkedCount == this.shops.length){
@@ -189,6 +233,192 @@
 			}
 		},
 		methods: {
+			submitPage(){
+				let that = this;
+				var oldValue = that.$refs.inputPage.value;
+				if(oldValue < 1 || oldValue > that.totalPage || (oldValue == that.currentPage))
+					return false;
+				else{
+					that.currentPage = oldValue;
+					ajax({
+						url: "http://rainbowvs.com/yuewang/ywwms/interface/shop.php",
+						overtime: 3000,
+						data: {
+							handle: 'get',
+							page: that.currentPage,//商品分页
+							token: localStorage.getItem("yw_token"),
+						},
+						complete (msg){
+							console.log(msg);
+						}
+					}).then(response => {
+						if(response.type == 'success'){
+							that.shops = [];
+							for(let i in response.shops)
+								that.shops.push({
+									id: response.shops[i].id,
+									typeId: response.shops[i].typeId,
+									name: response.shops[i].name,
+									price: response.shops[i].price,
+									purchased: response.shops[i].purchased,
+									inventory: response.shops[i].inventory,
+									color: response.shops[i].color,
+									poster: response.shops[i].poster,
+									pic1: response.shops[i].pic1,
+									pic2: response.shops[i].pic2,
+									cdate: response.shops[i].cdate,
+									checked: false
+								});
+							that.totalPage = response.totalPage;
+						}else if(response.type == "error"){
+							that.$store.commit('TOGGLE_WARNING',{
+								msg: response.msg,
+								visibility: true,
+							});
+						}
+					}).catch(status => {
+						console.log(status);
+					});
+				}
+			},
+			toPrev(e){
+				let that = this;
+				if(that.currentPage > 1){
+					that.currentPage--;
+					ajax({
+						url: "http://rainbowvs.com/yuewang/ywwms/interface/shop.php",
+						overtime: 3000,
+						data: {
+							handle: 'get',
+							page: that.currentPage,//商品分页
+							token: localStorage.getItem("yw_token"),
+						},
+						complete (msg){
+							console.log(msg);
+						}
+					}).then(response => {
+						if(response.type == 'success'){
+							that.shops = [];
+							for(let i in response.shops)
+								that.shops.push({
+									id: response.shops[i].id,
+									typeId: response.shops[i].typeId,
+									name: response.shops[i].name,
+									price: response.shops[i].price,
+									purchased: response.shops[i].purchased,
+									inventory: response.shops[i].inventory,
+									color: response.shops[i].color,
+									poster: response.shops[i].poster,
+									pic1: response.shops[i].pic1,
+									pic2: response.shops[i].pic2,
+									cdate: response.shops[i].cdate,
+									checked: false
+								});
+							that.totalPage = response.totalPage;
+						}else if(response.type == "error"){
+							that.$store.commit('TOGGLE_WARNING',{
+								msg: response.msg,
+								visibility: true,
+							});
+						}
+					}).catch(status => {
+						console.log(status);
+					});
+				}
+			},
+			toNext(e){
+				let that = this;
+				if(that.currentPage < that.totalPage){
+					that.currentPage++;
+					ajax({
+						url: "http://rainbowvs.com/yuewang/ywwms/interface/shop.php",
+						overtime: 3000,
+						data: {
+							handle: 'get',
+							page: that.currentPage,//商品分页
+							token: localStorage.getItem("yw_token"),
+						},
+						complete (msg){
+							console.log(msg);
+						}
+					}).then(response => {
+						if(response.type == 'success'){
+							that.shops = [];
+							for(let i in response.shops)
+								that.shops.push({
+									id: response.shops[i].id,
+									typeId: response.shops[i].typeId,
+									name: response.shops[i].name,
+									price: response.shops[i].price,
+									purchased: response.shops[i].purchased,
+									inventory: response.shops[i].inventory,
+									color: response.shops[i].color,
+									poster: response.shops[i].poster,
+									pic1: response.shops[i].pic1,
+									pic2: response.shops[i].pic2,
+									cdate: response.shops[i].cdate,
+									checked: false
+								});
+							that.totalPage = response.totalPage;
+						}else if(response.type == "error"){
+							that.$store.commit('TOGGLE_WARNING',{
+								msg: response.msg,
+								visibility: true,
+							});
+						}
+					}).catch(status => {
+						console.log(status);
+					});
+				}
+			},
+			selectPage(e,page){
+				let that = this;
+				if(page > that.totalPage)
+					return false;
+				else if(page < 1)
+					return false;
+				if(that.currentPage != page)
+					that.currentPage = page;
+				ajax({
+					url: "http://rainbowvs.com/yuewang/ywwms/interface/shop.php",
+					overtime: 3000,
+					data: {
+						handle: 'get',
+						page: page,//商品分页
+						token: localStorage.getItem("yw_token"),
+					},
+					complete (msg){
+						console.log(msg);
+					}
+				}).then(response => {
+					if(response.type == 'success'){
+						that.shops = [];
+						for(let i in response.shops)
+							that.shops.push({
+								id: response.shops[i].id,
+								typeId: response.shops[i].typeId,
+								name: response.shops[i].name,
+								price: response.shops[i].price,
+								purchased: response.shops[i].purchased,
+								inventory: response.shops[i].inventory,
+								color: response.shops[i].color,
+								poster: response.shops[i].poster,
+								pic1: response.shops[i].pic1,
+								pic2: response.shops[i].pic2,
+								cdate: response.shops[i].cdate,
+								checked: false
+							});
+						that.totalPage = response.totalPage;
+					}else if(response.type == "error"){
+						that.$store.commit('TOGGLE_WARNING',{
+							msg: response.msg,
+							visibility: true,
+						});
+					}
+				}).catch(status => {
+					console.log(status);
+				});
+			},
 			eOk (type) {
 				let that = this;
 				if(type == 'add'){
@@ -418,6 +648,66 @@
 										color: #20a0ff;
 									}
 								}
+							}
+						}
+					}
+				}
+				&>.pagination{
+					margin: 5px 0;
+					height: 33px;
+					&>ul{
+						line-height: 31px;
+						position: fixed;
+						overflow: hidden;
+						&>li{
+							margin-left: -1px;
+							float: left;
+							border:1px solid #dfe6ec;
+							padding: 0 10px;
+							cursor: pointer;
+							position: relative;
+							&.prev{
+								margin-left: 0;
+							}
+							&.dot{
+								padding: 1px 10px;
+								cursor: default;
+								border: 0;
+							}
+							&:hover{
+								z-index: 1;
+								border-color: #324157;
+							}
+							&.active{
+								border-color: #324157;
+								background-color: #324157;
+								color: #fff;
+							}
+						}
+						&>p{
+							margin: 0 10px;
+							line-height: 33px;
+							float: left;
+							&>input{
+								line-height: 26px;
+								border: 1px solid #dfe6ec;
+								text-align: center;
+								width: 50px;
+							}
+						}
+						&>button{
+							margin: 3px 0;
+							float: left;
+							width: 50px;
+						    height: 27px;
+						    cursor: pointer;
+						    background-color: #324157;
+						    color: #bfcbd9;
+						    &:hover{
+								background-color: #48576a;
+							}
+							&:active{
+								color: #20a0ff;
 							}
 						}
 					}

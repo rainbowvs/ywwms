@@ -5,7 +5,7 @@
 	
 	//总页数 = 总商品数 ÷ 每页显示数量
 	$quantity = mysql_fetch_array(mysql_query("SELECT COUNT(*) FROM ywms_shop_info"),MYSQL_NUM)[0];//总商品数
-	$pageSize = 10;//每页显示数量
+	$pageSize = 5;//每页显示数量
 	$totalPage = ceil($quantity / $pageSize);//总页数
 	if(!isset($_GET['page'])){
 	    $page = 1;//当前页数,默认为1,
