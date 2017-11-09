@@ -16,7 +16,7 @@
 </template>
 
 <script>
-	import {ajax} from '../../../static/js/ajax.js';
+	import ajax from '../../../static/js/ajax.js';
 	import store from '@/vuex/store';
 	export default{
 		data () {

@@ -21,7 +21,7 @@
 
 <script>
 	import store from '@/vuex/store';
-	import {ajax} from '../../../static/js/ajax.js';
+	import ajax from '../../../static/js/ajax.js';
 	export default{
 		data () {
 			return {

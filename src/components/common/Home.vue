@@ -16,7 +16,6 @@
 	import Header from './Header';
 	import Sidebar from './Sidebar';
 	import store from '@/vuex/store';
-//	import {ajax,formatData} from '../../../static/js/ajax';
 	export default{
 		data () {
 			return {

@@ -50,4 +50,4 @@ let formatData = (data) => {
 	arr.push("timestamp="+(+new Date()));
 	return arr.join("&");
 }
-export {ajax};
+export default ajax;

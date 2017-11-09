@@ -65,7 +65,7 @@
 </template>
 
 <script>
-	import {ajax} from '../../../static/js/ajax.js';
+	import ajax from '../../../static/js/ajax.js';
 	import echarts from 'echarts';
 	import store from '@/vuex/store';
 	export default{
