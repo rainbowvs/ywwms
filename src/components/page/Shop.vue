@@ -48,18 +48,18 @@
 				</table>
 				<div class="pagination">
 					<ul>
-						<li class="prev" @click="toPrev($event)">&lt;</li>
-						<li v-for="page in pages" :class="{active:currentPage==page}" @click="selectPage($event,page)">{{page}}</li>
-						<li class="dot">...</li>
-						<li class="next" @click="toNext($event)">&gt;</li>
-						<template v-if="currentPage<totalPage">
-							<p>共 {{totalPage}} 页，到第 <input ref="inputPage" type="number" :value="toPage" :max="totalPage" min="1"/> 页</p>
-							<button @click="submitPage">确定</button>
-						</template>
-						<template v-else>
-							<p>共 {{totalPage}} 页，到第 <input ref="inputPage" type="number" :value="currentPage" :max="totalPage" min="1"/> 页</p>
-							<button @click="submitPage">确定</button>
-						</template>
+						<li class="prev">
+							<a href="javascript:;" @click="toPrev($event)">&lt;</a>
+						</li>
+						<li v-for="page in showPageBtn" :class="{active:currentPage==page}">
+							<a href="javascript:;" v-if="page" @click="selectPage($event,page)">{{page}}</a>
+							<a class="dot" href="javascript:;" v-else>···</a>
+						</li>
+						<li class="prev">
+							<a href="javascript:;" @click="toNext($event)">&gt;</a>
+						</li>
+						<p>共 {{totalPage}} 页，到第 <input ref="inputPage" type="number" :value="currentPage" :max="totalPage" min="1"/> 页</p>
+						<button @click="submitPage">确定</button>
 					</ul>
 				</div>
 			</div>
@@ -182,27 +182,21 @@
 			toPage () {
 				return +this.currentPage+1;
 			},
-			pages () {
-				let left = 1,
-					right = this.totalPage,
-					movePoint = Math.ceil(this.pageSize / 2),
-					pages = [];
-				if (this.currentPage > movePoint && this.currentPage < this.totalPage - movePoint + 1) {
-					left = this.pageSize % 2 === 0 ? this.currentPage - movePoint : this.currentPage - movePoint + 1;
-					right = this.currentPage + movePoint - 1;
-				} else if (this.currentPage <= movePoint) {
-					left = 1;
-					right = this.pageSize;
-				} else {
-					left = this.totalPage - this.pageSize + 1;
-					right = this.totalPage;
+			showPageBtn() {
+				var pageNum = this.totalPage;
+				var index = this.currentPage;
+				var arr = [];
+				if(pageNum <= 5) {
+					for(var i = 1; i <= pageNum; i++) {
+						arr.push(i)
+					}
+					return arr
 				}
-
-				while (left <= right) {
-					pages.push(left);
-					left++;
-				}
-				return pages;
+				if(index <= 2) return [1, 2, 3, 0, pageNum];
+				if(index >= pageNum - 1) return [1, 0, pageNum - 2, pageNum - 1, pageNum];
+				if(index === 3) return [1, 2, 3, 4, 0, pageNum];
+				if(index === pageNum - 2) return [1, 0, pageNum - 3, pageNum - 2, pageNum - 1, pageNum];
+				return [1, 0, index - 1, index, index + 1, 0, pageNum]
 			},
 			checkedAll: {
 				get () {
@@ -235,12 +229,12 @@
 		methods: {
 			submitPage(){
 				let that = this;
-				var oldValue = that.$refs.inputPage.value;
+				var oldValue = Number(that.$refs.inputPage.value);
 				if(oldValue < 1 || oldValue > that.totalPage || (oldValue == that.currentPage))
 					return false;
 				else{
 					console.log(that.currentPage,oldValue);
-//					that.currentPage = oldValue;
+					that.currentPage = oldValue;
 //					ajax({
 //						url: "http://rainbowvs.com/yuewang/ywwms/interface/shop.php",
 //						overtime: 3000,
@@ -664,9 +658,11 @@
 							margin-left: -1px;
 							float: left;
 							border:1px solid #dfe6ec;
-							padding: 0 10px;
-							cursor: pointer;
 							position: relative;
+							&>a{
+								padding: 6px 10px;
+								/*color: #fff;*/
+							}
 							&.prev{
 								margin-left: 0;
 							}
