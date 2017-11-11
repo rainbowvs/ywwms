@@ -2,7 +2,7 @@ let ajax = (opt) => {
 	opt = opt || {};
 	opt.type = (opt.type || "GET").toUpperCase();
 	opt.async = opt.async==undefined ? true : opt.async;
-	opt.overtime = opt.overtime || 8000;
+	opt.overtime = opt.overtime || 3000;
 	let params = formatData(opt.data);
 	let timer = null;
 	let xhr;
