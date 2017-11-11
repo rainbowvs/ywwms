@@ -96,26 +96,44 @@
 					return this.currentPage;
 			},
 			pages() {
-				let len = this.totalPage , temp = [], list = [], count = Math.floor(this.showPage / 2) ,center = this.currentPage;
+				let len = this.totalPage;
+				let temp = [];
+				let list = [];
+				let count = Math.floor(this.showPage / 2);
+				let center = this.currentPage;
+				
 				if( len <= this.showPage ){
-					while(len--){ temp.push({text:this.totalPage-len,val:this.totalPage-len});};
+					while(len--){
+						temp.push({
+							text: this.totalPage-len,
+							val: this.totalPage-len
+						});
+					};
 					return temp;
 				}
-				while(len--){ temp.push(this.totalPage - len);};
-				let idx = temp.indexOf(center);            	
-				(idx < count) && ( center = center + count - idx); 
+				
+				while(len--){
+					temp.push(this.totalPage - len);
+				};
+				
+				let idx = temp.indexOf(center);   
+				
+				(idx < count) && (center = center + count - idx); 
 				(this.currentPage > this.totalPage - count) && ( center = this.totalPage - count);
-				temp = temp.splice(center - count -1, this.showPage);            	
+				
+				temp = temp.splice(center - count -1, this.showPage);  
+				
 				do {
 					let t = temp.shift();
 					list.push({
 						text: t,
 						val: t
 					});
-				}while(temp.length);            	
-				if( this.totalPage > this.showPage ){
-					(this.currentPage > count + 1) && list.unshift({ text:'...',val: list[0].val - 1 });
-					(this.currentPage < this.totalPage - count) && list.push({ text:'...',val: list[list.length - 1].val + 1 });
+				}while(temp.length);
+				
+				if(this.totalPage > this.showPage){
+					(this.currentPage > count+1) && list.unshift({ text: '...',val: list[0].val-1 });
+					(this.currentPage < this.totalPage-count) && list.push({ text: '...',val: list[list.length-1].val+1 });
 				}
 				return list;
 			},
