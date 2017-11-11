@@ -132,15 +132,11 @@
 			//拉取商品信息
 			ajax({
 				url: "http://rainbowvs.com/yuewang/ywwms/interface/shop.php",
-				overtime: 3000,
 				data: {
 					handle: 'get',
 					page: 1,//商品分页
 					token: localStorage.getItem("yw_token"),
 				},
-				complete (msg){
-					console.log(msg);
-				}
 			}).then(response => {
 				if(response.type == 'success'){
 					for(let i in response.shops)
@@ -165,8 +161,6 @@
 						visibility: true,
 					});
 				}
-			}).catch(status => {
-				console.log(status);
 			});
 		},
 		components: {
@@ -203,20 +197,22 @@
 			}
 		},
 		methods: {
-			submitPage(oldValue){
+			getShopInfo (currentPage) {
 				let that = this;
-				that.currentPage = oldValue;
 				ajax({
 					url: "http://rainbowvs.com/yuewang/ywwms/interface/shop.php",
 					overtime: 3000,
 					data: {
 						handle: 'get',
-						page: that.currentPage,//商品分页
+						page: currentPage,//商品分页
 						token: localStorage.getItem("yw_token"),
 					},
-					complete (msg){
+					beforeSend () {
+						
+					},
+					complete (msg) {
 						console.log(msg);
-					}
+					},
 				}).then(response => {
 					if(response.type == 'success'){
 						that.shops = [];
@@ -246,133 +242,20 @@
 					console.log(status);
 				});
 			},
-			toPrev(oldValue){
-				let that = this;
-				that.currentPage = oldValue;
-				ajax({
-					url: "http://rainbowvs.com/yuewang/ywwms/interface/shop.php",
-					overtime: 3000,
-					data: {
-						handle: 'get',
-						page: that.currentPage,//商品分页
-						token: localStorage.getItem("yw_token"),
-					},
-					complete (msg){
-						console.log(msg);
-					}
-				}).then(response => {
-					if(response.type == 'success'){
-						that.shops = [];
-						for(let i in response.shops)
-							that.shops.push({
-								id: response.shops[i].id,
-								typeId: response.shops[i].typeId,
-								name: response.shops[i].name,
-								price: response.shops[i].price,
-								purchased: response.shops[i].purchased,
-								inventory: response.shops[i].inventory,
-								color: response.shops[i].color,
-								poster: response.shops[i].poster,
-								pic1: response.shops[i].pic1,
-								pic2: response.shops[i].pic2,
-								cdate: response.shops[i].cdate,
-								checked: false
-							});
-						that.totalPage = response.totalPage;
-					}else if(response.type == "error"){
-						that.$store.commit('TOGGLE_WARNING',{
-							msg: response.msg,
-							visibility: true,
-						});
-					}
-				}).catch(status => {
-					console.log(status);
-				});
+			submitPage (oldValue){
+				this.currentPage = oldValue;
+				this.getShopInfo(oldValue);
 			},
-			toNext(oldValue){
-				let that = this;
-				that.currentPage = oldValue;
-				ajax({
-					url: "http://rainbowvs.com/yuewang/ywwms/interface/shop.php",
-					overtime: 3000,
-					data: {
-						handle: 'get',
-						page: that.currentPage,//商品分页
-						token: localStorage.getItem("yw_token"),
-					},
-					complete (msg){
-						console.log(msg);
-					}
-				}).then(response => {
-					if(response.type == 'success'){
-						that.shops = [];
-						for(let i in response.shops)
-							that.shops.push({
-								id: response.shops[i].id,
-								typeId: response.shops[i].typeId,
-								name: response.shops[i].name,
-								price: response.shops[i].price,
-								purchased: response.shops[i].purchased,
-								inventory: response.shops[i].inventory,
-								color: response.shops[i].color,
-								poster: response.shops[i].poster,
-								pic1: response.shops[i].pic1,
-								pic2: response.shops[i].pic2,
-								cdate: response.shops[i].cdate,
-								checked: false
-							});
-						that.totalPage = response.totalPage;
-					}else if(response.type == "error"){
-						that.$store.commit('TOGGLE_WARNING',{
-							msg: response.msg,
-							visibility: true,
-						});
-					}
-				}).catch(status => {
-					console.log(status);
-				});
+			toPrev (oldValue) {
+				this.currentPage = oldValue;
+				this.getShopInfo(oldValue);
 			},
-			selectPage(page){
-				let that = this;
-				ajax({
-					url: "http://rainbowvs.com/yuewang/ywwms/interface/shop.php",
-					overtime: 3000,
-					data: {
-						handle: 'get',
-						page: page,//商品分页
-						token: localStorage.getItem("yw_token"),
-					},
-					complete (msg){
-						console.log(msg);
-					}
-				}).then(response => {
-					if(response.type == 'success'){
-						that.shops = [];
-						for(let i in response.shops)
-							that.shops.push({
-								id: response.shops[i].id,
-								typeId: response.shops[i].typeId,
-								name: response.shops[i].name,
-								price: response.shops[i].price,
-								purchased: response.shops[i].purchased,
-								inventory: response.shops[i].inventory,
-								color: response.shops[i].color,
-								poster: response.shops[i].poster,
-								pic1: response.shops[i].pic1,
-								pic2: response.shops[i].pic2,
-								cdate: response.shops[i].cdate,
-								checked: false
-							});
-						that.totalPage = response.totalPage;
-					}else if(response.type == "error"){
-						that.$store.commit('TOGGLE_WARNING',{
-							msg: response.msg,
-							visibility: true,
-						});
-					}
-				}).catch(status => {
-					console.log(status);
-				});
+			toNext (oldValue) {
+				this.currentPage = oldValue;
+				this.getShopInfo(oldValue);
+			},
+			selectPage (page) {
+				this.getShopInfo(page);
 			},
 			eOk (type) {
 				let that = this;
@@ -380,7 +263,6 @@
 					//提交新增商品信息
 					ajax({
 						url: "http://rainbowvs.com/yuewang/ywwms/interface/shop.php",
-						overtime: 3000,
 						data: {
 							handle: 'set',
 							typeId: that.current.typeId,
@@ -394,9 +276,6 @@
 							pic2: that.current.pic2,
 							token: localStorage.getItem("yw_token"),
 						},
-						complete (msg){
-							console.log(msg);
-						}
 					}).then(response => {
 						console.log(response);
 						if(response.type == 'success'){
@@ -422,14 +301,11 @@
 							msg: response.msg,
 							visibility: true,
 						});
-					}).catch(status => {
-						console.log(status);
 					});
 				}else if(type == 'edit'){
 					//提交修改商品信息
 					ajax({
 						url: "http://rainbowvs.com/yuewang/ywwms/interface/shop.php",
-						overtime: 3000,
 						data: {
 							handle: 'update',
 							id: that.current.id,
@@ -445,9 +321,6 @@
 							cdate: that.current.cdate,
 							token: localStorage.getItem("yw_token"),
 						},
-						complete (msg){
-							console.log(msg);
-						}
 					}).then(response => {
 						console.log(response);
 						if(response.type == 'success'){
@@ -459,8 +332,6 @@
 							msg: response.msg,
 							visibility: true,
 						});
-					}).catch(status => {
-						console.log(status);
 					});
 				}
 			},
@@ -490,15 +361,11 @@
 				if(arr_id.length != 0){
 					ajax({
 						url: "http://rainbowvs.com/yuewang/ywwms/interface/shop.php",
-						overtime: 3000,
 						data: {
 							handle: 'del',
 							ids: arr_id.join(","),
 							token: localStorage.getItem("yw_token"),
 						},
-						complete (msg){
-							console.log(msg);
-						}
 					}).then(response => {
 						arr_id = [];
 						console.log(response);
@@ -517,8 +384,6 @@
 							msg: response.msg,
 							visibility: true,
 						});
-					}).catch(status => {
-						console.log(status);
 					});
 				}else{
 					that.$store.commit('TOGGLE_WARNING',{
