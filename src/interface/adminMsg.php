@@ -25,4 +25,5 @@
 			echo '{"type":"error","msg":"token异常,请重新登录"}';
 		}
 	}
+	mysql_close();
 ?>
