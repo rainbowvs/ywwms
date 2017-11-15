@@ -3,8 +3,8 @@
 	require 'config.php';
 	$date = date("Y-m-d H:i:s",time());
 	
-	//总页数 = 总商品数 ÷ 每页显示数量
-	$quantity = mysql_fetch_array(mysql_query("SELECT COUNT(*) FROM ywms_order_info"),MYSQL_NUM)[0];//总商品数
+	//总页数 = 总订单数 ÷ 每页显示数量
+	$quantity = mysql_fetch_array(mysql_query("SELECT COUNT(*) FROM ywms_order_info"),MYSQL_NUM)[0];//总订单数
 	$pageSize = 10;//每页显示数量
 	$totalPage = ceil($quantity / $pageSize);//总页数
 	if(!isset($_GET['page'])){
@@ -23,7 +23,7 @@
 		$r2 = (string)mt_rand(10,99);
 		$oid = $r1.(string)$date.$r2;
 		
-		$userToken = mysql_fetch_array(mysql_query("SELECT token FROM ywms_user_info WHERE user='{$_GET['user']}'"),MYSQL_NUM)[0];//总商品数
+		$userToken = mysql_fetch_array(mysql_query("SELECT token FROM ywms_user_info WHERE user='{$_GET['user']}'"),MYSQL_NUM)[0];//总订单数
 		
 		mysql_free_result();
 		
