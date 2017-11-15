@@ -16,8 +16,6 @@
 </template>
 
 <script>
-	import ajax from '../../../static/js/ajax.js';
-	import store from '@/vuex/store';
 	export default{
 		data () {
 			return {
@@ -25,9 +23,9 @@
 				adminName: ''
 			}
 		},
-		store,
 		created () {
-			ajax({
+			let that = this;
+			that.$ajax({
 				url: "http://rainbowvs.com/yuewang/ywwms/interface/getAdminName.php",
 				overtime: 3000,
 				data: {
@@ -38,19 +36,19 @@
 				}
 			}).then( response => {
 				if(response.type == 'success')
-					this.adminName = response.name;
+					that.adminName = response.name;
 				else if(response.type == "error"){
-					this.$store.commit('TOGGLE_WARNING',{
+					that.$store.commit('TOGGLE_WARNING',{
 						msg: response.msg,
 						visibility: true,
 					});
 					localStorage.removeItem("yw_token");
 					setTimeout(()=>{
-						this.$store.commit('TOGGLE_WARNING',{
+						that.$store.commit('TOGGLE_WARNING',{
 							msg: '',
 							visibility: false,
 						});
-						this.$router.push('/login');
+						that.$router.push('/login');
 					},1000);
 				}
 					

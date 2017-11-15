@@ -110,10 +110,6 @@
 </template>
 
 <script>
-	import store from '@/vuex/store';
-	import ajax from '../../../static/js/ajax.js';
-	import Edit from '@/components/common/Edit'
-	import Pagination from '@/components/common/Pagination'
 	export default{
 		data () {
 			return {
@@ -126,11 +122,10 @@
 				showPage: 5,//显示的页数[只能输入奇数,偶数最后一页无法显示]
 			}
 		},
-		store,
 		created () {
 			let that = this;
 			//拉取商品信息
-			ajax({
+			that.$ajax({
 				url: "http://rainbowvs.com/yuewang/ywwms/interface/shop.php",
 				data: {
 					handle: 'get',
@@ -164,8 +159,8 @@
 			});
 		},
 		components: {
-			'my-edit': Edit,
-			'my-pagination': Pagination,
+			'my-edit': () => import('@/components/common/Edit'),//webpack2官网推荐使用, 属于es7范畴, 需要配合babel的syntax-dynamic-import插件使用,
+			'my-pagination': () => import('@/components/common/Pagination'),
 		},
 		computed: {
 			checkedAll: {
@@ -199,7 +194,7 @@
 		methods: {
 			getShopInfo (currentPage) {
 				let that = this;
-				ajax({
+				that.$ajax({
 					url: "http://rainbowvs.com/yuewang/ywwms/interface/shop.php",
 					overtime: 3000,
 					data: {
@@ -261,7 +256,7 @@
 				let that = this;
 				if(type == 'add'){
 					//提交新增商品信息
-					ajax({
+					that.$ajax({
 						url: "http://rainbowvs.com/yuewang/ywwms/interface/shop.php",
 						data: {
 							handle: 'set',
@@ -304,7 +299,7 @@
 					});
 				}else if(type == 'edit'){
 					//提交修改商品信息
-					ajax({
+					that.$ajax({
 						url: "http://rainbowvs.com/yuewang/ywwms/interface/shop.php",
 						data: {
 							handle: 'update',
@@ -359,7 +354,7 @@
 						arr_id.push(item.id);
 				});
 				if(arr_id.length != 0){
-					ajax({
+					that.$ajax({
 						url: "http://rainbowvs.com/yuewang/ywwms/interface/shop.php",
 						data: {
 							handle: 'del',

@@ -18,7 +18,6 @@
 </template>
 
 <script>
-	import store from '@/vuex/store';
 	export default{
 		props: {
 			current: {
@@ -55,7 +54,6 @@
 				this.showPage = val;
 			},
 		},
-		store,
 		methods: {
 			toPrev(e) {
 				if(this.currentPage > 1){

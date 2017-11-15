@@ -17,14 +17,12 @@
 </template>
 
 <script>
-	import store from '@/vuex/store';
 	export default{
 		data () {
 			return {
 				
 			}
 		},
-		store,
 		methods: {
 			show (e) {
 				this.$store.commit('TOGGLE_WARNING',{

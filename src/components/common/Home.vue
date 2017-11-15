@@ -15,7 +15,6 @@
 <script>
 	import Header from './Header';
 	import Sidebar from './Sidebar';
-	import store from '@/vuex/store';
 	export default{
 		data () {
 			return {

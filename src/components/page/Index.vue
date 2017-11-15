@@ -65,9 +65,7 @@
 </template>
 
 <script>
-	import ajax from '../../../static/js/ajax.js';
 	import echarts from 'echarts';
-	import store from '@/vuex/store';
 	export default{
 		data () {
 			return {
@@ -80,11 +78,10 @@
 				task: '',
 			}
 		},
-		store,
 		created () {
 			let that = this;
 			//拉取任务列表
-			ajax({
+			that.$ajax({
 				url: "http://rainbowvs.com/yuewang/ywwms/interface/adminTask.php",
 				overtime: 3000,
 				data: {
@@ -109,7 +106,7 @@
 				console.log(status);
 			});
 			//拉取信息列表
-			ajax({
+			that.$ajax({
 				url: "http://rainbowvs.com/yuewang/ywwms/interface/adminMsg.php",
 				overtime: 3000,
 				data: {
@@ -152,7 +149,7 @@
 					});
 				}else{
 					let that = this;
-					ajax({
+					that.$ajax({
 						url: "http://rainbowvs.com/yuewang/ywwms/interface/adminTask.php",
 						overtime: 3000,
 						data: {
@@ -190,7 +187,7 @@
 			},
 			removeTodo (value) {
 				let that = this;
-				ajax({
+				that.$ajax({
 					url: "http://rainbowvs.com/yuewang/ywwms/interface/adminTask.php",
 					overtime: 3000,
 					data: {
@@ -231,7 +228,7 @@
 						arr_id.push(item.id);
 				});
 				if(arr_id.length != 0){
-					ajax({
+					that.$ajax({
 						url: "http://rainbowvs.com/yuewang/ywwms/interface/adminMsg.php",
 						overtime: 3000,
 						data: {

@@ -12,7 +12,6 @@
 </template>
 
 <script>
-	import store from '@/vuex/store';
 	export default{
 		data () {
 			return {
@@ -25,7 +24,6 @@
 				],
 			}
 		},
-		store,
 		methods: {
 			toggle (e,index) {
 				this.$store.commit('UPDATE_CURRENTPAGE',index);
@@ -37,7 +35,6 @@
 		    	if(this.$store.state.currentPage===0 && localData){
 		    		this.$store.commit('UPDATE_CURRENTPAGE',localData);//同步操作
 		    	}
-//		    	console.log(this.$store.state.currentPage);
 		    	return this.$store.state.currentPage;
 			}
 		}

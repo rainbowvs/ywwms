@@ -20,8 +20,6 @@
 </template>
 
 <script>
-	import store from '@/vuex/store';
-	import ajax from '../../../static/js/ajax.js';
 	export default{
 		data () {
 			return {
@@ -30,7 +28,6 @@
 				code: '',
 			}
 		},
-		store,
 		mounted () {
 			
 		},
@@ -63,7 +60,7 @@
 						visibility: true,
 					});
 				}else{
-					ajax({
+					that.$ajax({
 						url: "http://rainbowvs.com/yuewang/ywwms/interface/login.php",
 						type: "post",
 						async: true,
