@@ -1,13 +1,5 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Home from '@/components/common/Home'
-import Index from '@/components/page/Index'
-import Order from '@/components/page/Order'
-import Shop from '@/components/page/Shop'
-import Administrator from '@/components/page/Administrator'
-import User from '@/components/page/User'
-import Login from '@/components/page/Login'
-
 
 Vue.use(Router)
 
@@ -16,39 +8,39 @@ export default new Router({
   routes: [
     {
       path: '/',
-      component: Home,
+      component: resolve => require(['@/components/common/Home'], resolve),
       children: [
      		{
           path:'',
           name: 'Index',
-          component: Index,
+          component: resolve => require(['@/components/page/Index'], resolve),
         },
       	{
       		path: '/order',
 		      name: 'Order',
-		      component: Order,
+		      component: resolve => require(['@/components/page/Order'], resolve),
       	},
       	{
       		path: '/shop',
 		      name: 'Shop',
-		      component: Shop,
+		      component: resolve => require(['@/components/page/Shop'], resolve),
       	},
       	{
       		path: '/administrator',
 		      name: 'Administrator',
-		      component: Administrator,
+		      component: resolve => require(['@/components/page/Administrator'], resolve),
       	},
       	{
       		path: '/user',
 		      name: 'User',
-		      component: User,
+		      component: resolve => require(['@/components/page/User'], resolve),
       	},
       ]
     },
     {
 			path: '/login',
 	    name: 'Login',
-	    component: Login,
+	    component: resolve => require(['@/components/page/Login'], resolve),
 		},
   ]
 })
