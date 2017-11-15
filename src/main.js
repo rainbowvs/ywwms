@@ -3,9 +3,13 @@
 import Vue from 'vue';
 import App from './App';
 import router from './router';
+import store from '@/vuex/store';
 import Loading from '@/components/common/Loading';
 import Warn from '@/components/common/Warn';
 import Dialog from '@/components/common/Dialog';
+import ajax from '../static/js/ajax.js';
+
+Vue.prototype.$ajax = ajax;
 
 Vue.component('my-loading',Loading);
 Vue.component('my-warn',Warn);
@@ -16,6 +20,7 @@ Vue.config.productionTip = true;
 new Vue({
   el: '#app',
   router,
+  store,
   template: '<App/>',
   components: { App }
 });
