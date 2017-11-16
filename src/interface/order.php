@@ -25,7 +25,7 @@
 		$r2 = (string)mt_rand(10,99);
 		$oid = $r1.(string)$msectime.$r2;
 		
-		$uid = mysql_fetch_array(mysql_query("SELECT uid FROM ywms_user_info WHERE {$_GET['user']}"),MYSQL_NUM)[0];
+		$uid = mysql_fetch_array(mysql_query("SELECT uid FROM ywms_user_info WHERE '{$_GET['user']}'"),MYSQL_NUM)[0];
 		if(!isset($uid))
 			exit('{"type":"error","msg":"该用户不存在"}');
 		
