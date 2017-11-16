@@ -6,7 +6,7 @@
 				<div class="taskList">
 					<h2>任务列表</h2>
 					<hr />
-					<input type="text" name="task" id="task" v-model="task" placeholder="回车增加任务" @keyup.enter="addTodo($event)" />
+					<input type="text" name="task" id="task" v-model="task" placeholder="回车添加任务" @keyup.enter="addTodo($event)" />
 					<ul>
 						<template v-if="todos.length==0">
 							<h6>暂时没有设定任务</h6>
@@ -101,7 +101,7 @@
 						visibility: true,
 					});
 				}
-				console.log(that.todos);
+//				console.log(that.todos);
 			}).catch(status => {
 				console.log(status);
 			});
