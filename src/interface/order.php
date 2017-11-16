@@ -1,7 +1,9 @@
 <?php
 	header('Access-Control-Allow-Origin:*');
 	require 'config.php';
-	$date = date("Y-m-d H:i:s",time());
+	list($tmp1, $tmp2) = explode(' ', microtime());
+	$msectime = (float)sprintf('%.0f', (floatval($tmp1) + floatval($tmp2)) * 1000);
+	$date = date("Y-m-d H:i:s",$tmp2);
 	
 	//总页数 = 总订单数 ÷ 每页显示数量
 	$quantity = mysql_fetch_array(mysql_query("SELECT COUNT(*) FROM ywms_order_info"),MYSQL_NUM)[0];//总订单数
@@ -21,29 +23,29 @@
 		//生成oid(订单编号)
 		$r1 = (string)mt_rand(10,99);
 		$r2 = (string)mt_rand(10,99);
-		$oid = $r1.(string)$date.$r2;
+		$oid = $r1.(string)$msectime.$r2;
 		
-		$userToken = mysql_fetch_array(mysql_query("SELECT token FROM ywms_user_info WHERE user='{$_GET['user']}'"),MYSQL_NUM)[0];//总订单数
+		$uid = mysql_fetch_array(mysql_query("SELECT uid FROM ywms_user_info WHERE user='{$_GET['user']}'"),MYSQL_NUM)[0];//总订单数
 		
 		mysql_free_result();
 		
 		$query = mysql_query(
-			"INSERT INTO ywms_order_info (oid,token,state,totalPrice,address,cdate) 
-				  VALUES ('{$oid}','{$userToken}','{$_GET['state']}','{$_GET['totalPrice']}','{$_GET['address']}','{$date}')"
+			"INSERT INTO ywms_order_info (oid,uid,state,totalPrice,address,cdate) 
+				  VALUES ('{$oid}','{$uid}','{$_GET['state']}','{$_GET['totalPrice']}','{$_GET['address']}','{$date}')"
 		) or die("SQL 错误！");
 		
 		if(mysql_affected_rows() == 1){
 			mysql_free_result($query);
 			$query = mysql_query(
-				"SELECT ywms_user_info.user,
-						ywms_order_info.id,
-						ywms_order_info.oid,
-						ywms_order_info.state,
-						ywms_order_info.totalPrice,
-						ywms_order_info.address
-				   FROM ywms_user_info INNER JOIN ywms_order_info
-				     ON ywms_user_info.token='{$userToken}'
-				  WHERE ywms_order_info.cdate='{$date}'"
+				"SELECT u.user AS user,
+						o.oid AS oid,
+						o.uid AS uid,
+						o.state AS state,
+						o.totalPrice AS totalPrice,
+						o.address AS address
+				   FROM ywms_user_info u INNER JOIN ywms_order_info o
+				     ON u.user='{$_GET['user']}'
+				  WHERE o.uid='{$date}'"
 			);
 			if(!!$result = mysql_fetch_array($query, MYSQL_ASSOC))
 				echo json_encode(array(
@@ -56,15 +58,16 @@
 		}
 	}else if($_GET['handle'] == 'get'){
 		$query = mysql_query(
-			"SELECT ywms_user_info.user,
-					ywms_order_info.id,
-					ywms_order_info.oid,
-					ywms_order_info.state,
-					ywms_order_info.totalPrice,
-					ywms_order_info.address
-			   FROM ywms_user_info INNER JOIN ywms_order_info
-			     ON ywms_user_info.token='{$_GET['token']}'
-			  WHERE ywms_order_info.cdate='{$date}'
+			"SELECT u.user AS user,
+					u.name AS name,
+					o.oid AS oid,
+					o.uid AS uid,
+					o.state AS state,
+					o.totalPrice AS totalPrice,
+					o.address AS address,
+					o.cdate AS cdate 
+			   FROM ywms_user_info u INNER JOIN ywms_order_info o
+			     ON o.uid=u.uid
 			  LIMIT {$limit},{$pageSize}"
 		) or die("SQL 错误！");
 		
@@ -80,16 +83,17 @@
 		),JSON_UNESCAPED_UNICODE);
 	}else if($_GET['handle'] == 'update'){
 		$query = mysql_query(
-			"UPDATE ywms_order_info
-				SET token='{$_GET['token']}',
-					state='{$_GET['state']}',
-					totalPrice='{$_GET['totalPrice']}',
-					address='{$_GET['address']}',
-					cdate='{$_GET['cdate']}' 
-			  WHERE id='{$_GET['id']}' 
-			  LIMIT 1"
+			"UPDATE ywms_order_info o
+		 INNER JOIN ywms_user_info u
+		 		 ON o.uid=u.uid 
+				SET o.state='{$_GET['state']}',
+					o.totalPrice='{$_GET['totalPrice']}',
+					o.address='{$_GET['address']}',
+					o.cdate='{$_GET['cdate']}',
+					u.user = '{$_['user']}'
+			  WHERE o.uid='{$_GET['uid']}' AND o.oid='{$_GET['oid']}'"
 		) or die('SQL 错误！');
-		if (mysql_affected_rows() == 1){
+		if (mysql_affected_rows() > 0){
 			echo '{"type":"success","msg":"订单修改成功"}';
 		}else{
 			echo '{"type":"error","msg":"token异常,请重新登录"}';
@@ -97,7 +101,7 @@
 	}else if($_GET['handle'] == 'del'){
 		$query = mysql_query(
 			"DELETE FROM ywms_order_info 
-				   WHERE id IN (".$_GET['ids'].")"
+				   WHERE oid IN (".$_GET['oids'].")"
 		) or die("SQL 错误！");
 		
 		if(mysql_affected_rows() != 0){
