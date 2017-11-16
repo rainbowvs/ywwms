@@ -25,7 +25,9 @@
 		$r2 = (string)mt_rand(10,99);
 		$oid = $r1.(string)$msectime.$r2;
 		
-		$uid = mysql_fetch_array(mysql_query("SELECT uid FROM ywms_user_info WHERE user='{$_GET['user']}'"),MYSQL_NUM)[0];//总订单数
+		$uid = mysql_fetch_array(mysql_query("SELECT uid FROM ywms_user_info WHERE {$_GET['user']}"),MYSQL_NUM)[0];
+		if(!isset($uid))
+			exit('{"type":"error","msg":"该用户不存在"}');
 		
 		mysql_free_result();
 		
@@ -44,8 +46,9 @@
 						o.totalPrice AS totalPrice,
 						o.address AS address
 				   FROM ywms_user_info u INNER JOIN ywms_order_info o
-				     ON u.user='{$_GET['user']}'
-				  WHERE o.uid='{$date}'"
+				     ON u.uid=o.uid
+				  WHERE o.oid='{$oid}'
+				  LIMIT 1"
 			);
 			if(!!$result = mysql_fetch_array($query, MYSQL_ASSOC))
 				echo json_encode(array(
