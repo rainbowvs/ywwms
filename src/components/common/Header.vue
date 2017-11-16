@@ -141,7 +141,7 @@
 	    		}
 	    		&>ul{
 	    			position: absolute;
-	    			right: 0px;
+	    			right: -30px;
 	    			top: 66px;
 	    			border: 1px solid #324157;
 	    			&>li{
