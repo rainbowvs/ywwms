@@ -7,44 +7,29 @@
 					<tbody>
 						<tr>
 							<th>选择</th>
-							<th>订单号</th>
-							<th>总价</th>
+							<th>编号</th>
 							<th>状态</th>
+							<th>账号</th>
+							<th>收货人</th>
+							<th>收货地址</th>
+							<th>总价</th>
 							<th>创建时间</th>
 							<th>操作</th>
 						</tr>
 						<template v-if="orders.length==0">
 							<tr>
-								<td colspan="6">暂时没有找到订单信息</td>
+								<td colspan="9">暂时没有找到订单信息</td>
 							</tr>
 						</template>
 						<template v-else>
 							<tr v-for="order,index in orders">
 								<td><input type="checkbox" v-model="order.checked" /></td>
-								<td>
-									<template v-if="editable && flag==index">
-										<input type="text" v-model="order.id" />
-									</template>
-									<template v-else>
-										{{order.id}}
-									</template>
-								</td>
-								<td>
-									<template v-if="editable && flag==index">
-										<input type="text" v-model="order.totalPrice" />
-									</template>
-									<template v-else>
-										{{order.totalPrice}}
-									</template>
-								</td>
-								<td>
-									<template v-if="editable && flag==index">
-										<input type="text" v-model="order.state" />
-									</template>
-									<template v-else>
-										{{order.state}}
-									</template>
-								</td>
+								<td>{{order.oid}}</td>
+								<td>{{order.state}}</td>
+								<td>{{order.user}}</td>
+								<td>{{order.name}}</td>
+								<td>{{order.address}}</td>
+								<td>{{order.totalPrice}}</td>
 								<td>{{order.cdate}}</td>
 								<td><button @click="edit($event,index)">编辑</button></td>
 							</tr>
@@ -52,10 +37,20 @@
 						<tr>
 							<td><input type="checkbox" v-model="checkedAll" /></td>
 							<td><button @click="remove">删除</button></td>
-							<td colspan="4"></td>
+							<td><button @click="add">增加</button></td>
+							<td colspan="6"></td>
 						</tr>
 					</tbody>
 				</table>
+				<my-pagination
+					:current="currentPage"
+					:total="totalPage"
+					:show="showPage"
+					@prev="toPrev"
+					@next="toNext"
+					@selectpage="selectPage"
+					@submitpage="submitPage">
+				</my-pagination>
 			</div>
 		</div>
 	</div>
@@ -65,13 +60,21 @@
 	export default{
 		data () {
 			return {
-				orders: [
-					{id: 13800138000,totalPrice: 6869,state: '等待发货',cdate: '2017-10-13 9:40:13',checked: false},
-					{id: 13800138000,totalPrice: 6869,state: '等待发货',cdate: '2017-10-13 9:40:13',checked: false},
-				],
-				flag: null,
-				editable: false,
+				current: {},
+				orders: [],
+				focus: null,
+				type: '',
+				totalPage: 1,//总页数
+				currentPage: 1,//当前显示第几页
+				showPage: 5,//显示的页数[只能输入奇数,偶数最后一页无法显示]
 			}
+		},
+		created () {
+			this.getOrderInfo(1);
+		},
+		components: {
+			'my-edit': () => import('@/components/common/Edit'),
+			'my-pagination': () => import('@/components/common/Pagination'),
 		},
 		computed: {
 			checkedAll: {
@@ -103,22 +106,61 @@
 			}
 		},
 		methods: {
-			edit (e,index) {
-				this.editable = !this.editable;
-				if(this.editable)
-					e.target.innerText = '保存';
-				else
-					e.target.innerText = '编辑';
-				this.flag = index;
+			getOrderInfo (currentPage) {
+				let that = this;
+				that.$ajax({
+					url: "http://rainbowvs.com/yuewang/ywwms/interface/order.php",
+					overtime: 3000,
+					data: {
+						handle: 'get',
+						page: currentPage,//商品分页
+						token: localStorage.getItem("yw_token"),
+					},
+					beforeSend () {
+						
+					},
+					complete (msg) {
+						console.log(msg);
+					},
+				}).then(response => {
+					if(response.type == 'success'){
+						that.orders = [];
+						for(let i in response.orders)
+							that.orders.push({
+								oid: response.orders[i].oid,
+								uid: response.orders[i].uid,
+								state: response.orders[i].state,
+								user: response.orders[i].user,
+								name: response.orders[i].name,
+								address: response.orders[i].address,
+								totalPrice: response.orders[i].totalPrice,
+								cdate: response.orders[i].cdate,
+								checked: false
+							});
+						that.totalPage = response.totalPage;
+					}else if(response.type == "error"){
+						that.$store.commit('TOGGLE_WARNING',{
+							msg: response.msg,
+							visibility: true,
+						});
+					}
+				}).catch(status => {
+					console.log(status);
+				});
 			},
 			remove () {
-				let temp = [];
-				this.orders.forEach((item) => {
-					if(!item.checked)
-						temp.push(item);
-				});
-				this.orders = temp;
-			}
+				
+			},
+			add () {
+				
+			},
+			edit (e,page) {
+				
+			},
+			toPrev () {},
+			toNext () {},
+			selectPage () {},
+			submitPage () {},
 		}
 	}
 </script>
@@ -200,5 +242,8 @@
 				}
 			}
 		}
+	}
+	input::-webkit-input-placeholder{
+	    color: #aaa;
 	}
 </style>
