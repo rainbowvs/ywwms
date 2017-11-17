@@ -53,6 +53,8 @@
 				</my-pagination>
 			</div>
 		</div>
+		<my-edit ref="edit" @sure="eOk"></my-edit>
+		<my-dialog ref="dialog" @sure="dOk"></my-dialog>
 	</div>
 </template>
 
@@ -148,19 +150,87 @@
 					console.log(status);
 				});
 			},
-			remove () {
-				
+			submitPage (oldValue){
+				this.currentPage = oldValue;
+				this.getOrderInfo(oldValue);
+			},
+			toPrev (oldValue) {
+				this.currentPage = oldValue;
+				this.getOrderInfo(oldValue);
+			},
+			toNext (oldValue) {
+				this.currentPage = oldValue;
+				this.getOrderInfo(oldValue);
+			},
+			selectPage (page) {
+				this.getOrderInfo(page);
+			},
+			eOk (type) {
+				let that = this;
+				if(type == 'add'){
+					//提交新增订单信息
+				}else if(type == 'edit'){
+					//提交修改订单信息
+				}
 			},
 			add () {
-				
+				this.current = {};//清空edit页面数据
+				this.type = 'add';
+				this.$refs.edit.open('add');
 			},
-			edit (e,page) {
-				
+			edit (e,index) {
+				this.focus = index;
+				this.current = this.orders[this.focus];
+				this.type = 'edit';
+				this.$refs.edit.open('edit');
 			},
-			toPrev () {},
-			toNext () {},
-			selectPage () {},
-			submitPage () {},
+			remove () {
+				if(this.orders.length != 0){
+					this.$refs.dialog.open('确认要删除选中的商品?');
+				}
+			},
+			dOk () {
+				let that = this;
+				let arr_id = [];
+				that.orders.forEach((item) => {
+					if(item.checked)
+						arr_id.push(item.id);
+				});
+				if(arr_id.length != 0){
+					that.$ajax({
+						url: "http://rainbowvs.com/yuewang/ywwms/interface/shop.php",
+						data: {
+							handle: 'del',
+							ids: arr_id.join(","),
+							token: localStorage.getItem("yw_token"),
+						},
+					}).then(response => {
+						arr_id = [];
+						console.log(response);
+						if(response.type == 'success'){
+							let temp = [];
+							that.orders.forEach((item) => {
+								if(!item.checked)
+									temp.push(item);
+							});
+							that.orders = temp;
+							that.$refs.dialog.close();
+						}else if(response.type == "error"){
+							//服务器返回其他原因
+						}
+						that.$store.commit('TOGGLE_WARNING',{
+							msg: response.msg,
+							visibility: true,
+						});
+					});
+				}else{
+					that.$store.commit('TOGGLE_WARNING',{
+						msg: '没有选中任何商品',
+						visibility: true,
+					});
+					that.$refs.dialog.close();
+				}
+			},
 		}
 	}
 </script>

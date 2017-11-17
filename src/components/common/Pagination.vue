@@ -68,13 +68,12 @@
 				}
 			},
 			selectPage(e,page) {
-				if(page > this.totalPage)
+				if(page > this.totalPage || page < 1 || this.currentPage == page)
 					return false;
-				else if(page < 1)
-					return false;
-				else if(this.currentPage != page)
-					this.currentPage = page;
-				this.$emit('selectpage',this.currentPage);
+				else{
+					this.currentPage == page;
+					this.$emit('selectpage',this.currentPage);
+				}
 			},
 			submitPage(e) {
 				let oldValue = Number(this.$refs.inputPage.value);
@@ -172,6 +171,7 @@
 					border-color: #324157;
 					background-color: #324157;
 					&>a{
+						cursor: default;
 						color: #fff;
 					}
 				}
