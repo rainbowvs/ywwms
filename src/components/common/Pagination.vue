@@ -2,14 +2,14 @@
 	<div class="pagination">
 		<ul>
 			<li class="prev">
-				<a href="javascript:;" @click="toPrev($event)">&lt;</a>
+				<a :class="{ban:currentPage==1}" href="javascript:;" @click="toPrev($event)">&lt;</a>
 			</li>
 			<li v-for="page in pages" v-if="page.text!='...'" :class="{active:currentPage==page.text}">
 				<a href="javascript:;" @click="selectPage($event,page.text)">{{page.text}}</a>
 			</li>
 			<li class="dot" v-else>...</li>
-			<li class="prev">
-				<a href="javascript:;" @click="toNext($event)">&gt;</a>
+			<li class="next">
+				<a :class="{ban:currentPage==totalPage}" href="javascript:;" @click="toNext($event)">&gt;</a>
 			</li>
 			<p>共 {{totalPage}} 页，到第 <input ref="inputPage" type="number" :value="toPage" :max="totalPage" min="1"/> 页</p>
 			<button @click="submitPage">确定</button>
@@ -71,7 +71,7 @@
 				if(page > this.totalPage || page < 1 || this.currentPage == page)
 					return false;
 				else{
-					this.currentPage == page;
+					this.currentPage = page;
 					this.$emit('selectpage',this.currentPage);
 				}
 			},
@@ -154,6 +154,10 @@
 				position: relative;
 				&>a{
 					padding: 6px 10px;
+					&.ban{
+						cursor: default;
+						color: #CCCCCC;
+					}
 				}
 				&.prev{
 					margin-left: 0;
