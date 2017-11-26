@@ -72,8 +72,23 @@
 			  WHERE id='{$_GET['id']}' 
 			  LIMIT 1"
 		) or die('SQL 错误！');
-		if (mysql_affected_rows() == 1){
-			echo '{"type":"success","msg":"商品修改成功"}';
+		if(mysql_affected_rows() == 1){
+			mysql_free_result($query);
+			$query = mysql_query(
+				"SELECT * 
+				   FROM ywms_shop_info 
+				  WHERE id='{$_GET['id']}'
+				  LIMIT 1"
+			);
+			if(!!$result = mysql_fetch_array($query, MYSQL_ASSOC)){
+				echo json_encode(array(
+					"type" => "success",
+					"msg" => "商品修改成功",
+					"shop" => $result
+				),JSON_UNESCAPED_UNICODE);
+			}else{
+				echo '{"type":"error","msg":"更新商品后返回信息异常,请刷新页面后重试"}';
+			}
 		}else{
 			echo '{"type":"error","msg":"token异常,请重新登录"}';
 		}

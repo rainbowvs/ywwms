@@ -22,19 +22,19 @@
 		data () {
 			return {
 				visible: false,
-				type: null,
+				data: null,
 			}
 		},
 		methods: {
 			close () {
 				this.visible = false;
 			},
-			open (type) {
+			open (data) {
 				this.visible = true;
-				this.type = type;
+				this.data = data;
 			},
 			ok () {
-				this.$emit('sure',this.type);
+				this.$emit('sure',this.data);
 			},
 		},
 	}

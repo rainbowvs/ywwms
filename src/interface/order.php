@@ -53,7 +53,7 @@
 			if(!!$result = mysql_fetch_array($query, MYSQL_ASSOC))
 				echo json_encode(array(
 					"type" => "success",
-					"order" => "订单添加成功",
+					"msg" => "订单添加成功",
 					"order" => $result
 				));
 		}else{
@@ -93,13 +93,36 @@
 					o.totalPrice='{$_GET['totalPrice']}',
 					o.address='{$_GET['address']}',
 					o.cdate='{$_GET['cdate']}',
-					u.user = '{$_['user']}'
+					u.user = '{$_GET['user']}'
 			  WHERE o.uid='{$_GET['uid']}' AND o.oid='{$_GET['oid']}'"
 		) or die('SQL 错误！');
 		if (mysql_affected_rows() > 0){
-			echo '{"type":"success","msg":"订单修改成功"}';
+			mysql_free_result($query);
+			$query = mysql_query(
+				"SELECT u.user AS user,
+						u.name AS name,
+						o.oid AS oid,
+						o.uid AS uid,
+						o.state AS state,
+						o.totalPrice AS totalPrice,
+						o.address AS address,
+						o.cdate AS cdate 
+				   FROM ywms_user_info u INNER JOIN ywms_order_info o
+				     ON u.uid=o.uid
+				  WHERE o.oid='{$_GET['oid']}'
+				  LIMIT 1"
+			);
+			if(!!$result = mysql_fetch_array($query, MYSQL_ASSOC)){
+				echo json_encode(array(
+					"type" => "success",
+					"msg" => "订单修改成功",
+					"order" => $result
+				));
+			}else{
+				echo '{"type":"error","msg":"更新订单后返回信息异常,请刷新页面后重试"}';
+			}
 		}else{
-			echo '{"type":"error","msg":"token异常,请重新登录"}';
+			echo '{"type":"error","msg":"订单更新失败,请重新操作"}';
 		}
 	}else if($_GET['handle'] == 'del'){
 		$query = mysql_query(

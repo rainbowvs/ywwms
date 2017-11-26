@@ -37,8 +37,7 @@
 						<tr>
 							<td><input type="checkbox" v-model="checkedAll" /></td>
 							<td><button @click="remove">删除</button></td>
-							<td><button @click="add">增加</button></td>
-							<td colspan="6"></td>
+							<td colspan="7"></td>
 						</tr>
 					</tbody>
 				</table>
@@ -53,7 +52,46 @@
 				</my-pagination>
 			</div>
 		</div>
-		<my-edit ref="edit" @sure="eOk"></my-edit>
+		<my-edit ref="edit" @sure="eOk">
+			<template v-if="type == 'edit'">
+				<h1 slot="header">修改订单</h1>
+			</template>
+			<template v-else>
+				<h1 slot="header">增加订单</h1>
+			</template>
+			<form slot="body">
+				<ul>
+					<li>
+						<label for="oid">编号</label>
+						<input type="text" id="oid" :value="current.oid" readonly disabled />
+					</li>
+					<li>
+						<label for="state">状态</label>
+						<input type="text" id="state" v-model="current.state" placeholder="订单状态" />
+					</li>
+					<li>
+						<label for="user">账号</label>
+						<input type="text" id="user" v-model="current.user" placeholder="下单账号" />
+					</li>
+					<li>
+						<label for="name">收货人</label>
+						<input type="text" id="name"  v-model="current.name" placeholder="收货人名称" />
+					</li>
+					<li>
+						<label for="address">收货地址</label>
+						<input type="text" id="address" v-model="current.address" placeholder="收货地址" />
+					</li>
+					<li>
+						<label for="totalPrice">总价</label>
+						<input type="text" id="totalPrice" v-model="current.totalPrice" placeholder="订单总金额" />
+					</li>
+					<li>
+						<label for="cdate">时间</label>
+						<input type="text" id="cdate" v-model="current.cdate" placeholder="订单创建时间" />
+					</li>
+				</ul>
+			</form>
+		</my-edit>
 		<my-dialog ref="dialog" @sure="dOk"></my-dialog>
 	</div>
 </template>
@@ -165,24 +203,53 @@
 			selectPage (page) {
 				this.getOrderInfo(page);
 			},
-			eOk (type) {
+			eOk (index) {
 				let that = this;
-				if(type == 'add'){
-					//提交新增订单信息
-				}else if(type == 'edit'){
-					//提交修改订单信息
+				if(that.type == 'edit'){
+					if(that.$compareJson(that.orders[index],that.current)){
+						that.$store.commit('TOGGLE_WARNING',{
+							msg: '没做任何修改',
+							visibility: true,
+						});
+					}else{
+						//提交修改订单信息
+						that.$ajax({
+							url: "http://rainbowvs.com/yuewang/ywwms/interface/order.php",
+							data: {
+								handle: 'update',
+								oid: that.current.oid,
+								uid: that.current.uid,
+								state: that.current.state,
+								user: that.current.user,
+								name: that.current.name,
+								address: that.current.address,
+								totalPrice: that.current.totalPrice,
+								cdate: that.current.cdate,
+								token: localStorage.getItem("yw_token"),
+							},
+						}).then(response => {
+							if(response.type == 'success'){
+								let temp = response.order;
+								temp["checked"] = false;
+								that.orders.splice(index,1,temp);
+								that.$refs.edit.close();
+							}else if(response.type == "error"){
+								//服务器返回其他原因
+								console.log(response.msg);
+							}
+							that.$store.commit('TOGGLE_WARNING',{
+								msg: response.msg,
+								visibility: true,
+							});
+						});
+					}
 				}
-			},
-			add () {
-				this.current = {};//清空edit页面数据
-				this.type = 'add';
-				this.$refs.edit.open('add');
 			},
 			edit (e,index) {
 				this.focus = index;
-				this.current = this.orders[this.focus];
+				this.current = JSON.parse(JSON.stringify(this.orders[this.focus]));
 				this.type = 'edit';
-				this.$refs.edit.open('edit');
+				this.$refs.edit.open(this.focus);
 			},
 			remove () {
 				if(this.orders.length != 0){
@@ -198,7 +265,7 @@
 				});
 				if(arr_id.length != 0){
 					that.$ajax({
-						url: "http://rainbowvs.com/yuewang/ywwms/interface/shop.php",
+						url: "http://rainbowvs.com/yuewang/ywwms/interface/order.php",
 						data: {
 							handle: 'del',
 							ids: arr_id.join(","),
@@ -306,6 +373,60 @@
 										color: #20a0ff;
 									}
 								}
+							}
+						}
+					}
+				}
+			}
+		}
+		&>.edit{
+			.header{
+				
+			}
+			.body{
+				max-height: 500px;
+				overflow-y: auto;
+				&>form{
+					&>ul{
+						&>li{
+							margin: 8px auto;
+							line-height: 40px;
+							overflow: hidden;
+							&>label{
+								line-height: 38px;
+								box-sizing: border-box;
+								border: 1px solid #d8dce5;
+								border-right: 0;
+								cursor: pointer;
+								float: left;
+								width: 100px;
+								-webkit-user-select: none;
+							}
+							&>input{
+								width: 450px;
+								float: left;
+							    background-color: #fff;
+							    border: 1px solid #d8dce5;
+							    box-sizing: border-box;
+							    color: #000;
+							    display: inline-block;
+							    height: 40px;
+							    line-height: 1;
+							    outline: none;
+							    padding: 0 15px;
+							    transition: border-color .2s cubic-bezier(.645,.045,.355,1);
+							    &#oid{
+									cursor: not-allowed;
+									-webkit-user-select: none;
+									background-color: #dfe6ec;
+									&:focus{
+										border-color: #d8dce5;
+									}
+								}
+							    &:focus{
+							    	outline: none;
+    								border-color: #324157;
+							    }
 							}
 						}
 					}

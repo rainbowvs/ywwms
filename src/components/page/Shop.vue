@@ -252,9 +252,9 @@
 			selectPage (page) {
 				this.getShopInfo(page);
 			},
-			eOk (type) {
+			eOk (index) {
 				let that = this;
-				if(type == 'add'){
+				if(that.type == 'add'){
 					//提交新增商品信息
 					that.$ajax({
 						url: "http://rainbowvs.com/yuewang/ywwms/interface/shop.php",
@@ -297,37 +297,47 @@
 							visibility: true,
 						});
 					});
-				}else if(type == 'edit'){
-					//提交修改商品信息
-					that.$ajax({
-						url: "http://rainbowvs.com/yuewang/ywwms/interface/shop.php",
-						data: {
-							handle: 'update',
-							id: that.current.id,
-							typeId: that.current.typeId,
-							name: that.current.name,
-							price: that.current.price,
-							purchased: that.current.purchased,
-							inventory: that.current.inventory,
-							color: that.current.color,
-							poster: that.current.poster,
-							pic1: that.current.pic1,
-							pic2: that.current.pic2,
-							cdate: that.current.cdate,
-							token: localStorage.getItem("yw_token"),
-						},
-					}).then(response => {
-						console.log(response);
-						if(response.type == 'success'){
-							that.$refs.edit.close();
-						}else if(response.type == "error"){
-							//服务器返回其他原因
-						}
+				}else if(that.type == 'edit'){
+					if(that.$compareJson(that.shops[index],that.current)){
 						that.$store.commit('TOGGLE_WARNING',{
-							msg: response.msg,
+							msg: '没做任何修改',
 							visibility: true,
 						});
-					});
+					}else{
+						//提交修改商品信息
+						that.$ajax({
+							url: "http://rainbowvs.com/yuewang/ywwms/interface/shop.php",
+							data: {
+								handle: 'update',
+								id: that.current.id,
+								typeId: that.current.typeId,
+								name: that.current.name,
+								price: that.current.price,
+								purchased: that.current.purchased,
+								inventory: that.current.inventory,
+								color: that.current.color,
+								poster: that.current.poster,
+								pic1: that.current.pic1,
+								pic2: that.current.pic2,
+								cdate: that.current.cdate,
+								token: localStorage.getItem("yw_token"),
+							},
+						}).then(response => {
+							console.log(response);
+							if(response.type == 'success'){
+								let temp = response.shop;
+								temp["checked"] = false;
+								that.shops.splice(index,1,temp);
+								that.$refs.edit.close();
+							}else if(response.type == "error"){
+								//服务器返回其他原因
+							}
+							that.$store.commit('TOGGLE_WARNING',{
+								msg: response.msg,
+								visibility: true,
+							});
+						});
+					}
 				}
 			},
 			add () {
@@ -337,9 +347,9 @@
 			},
 			edit (e,index) {
 				this.focus = index;
-				this.current = this.shops[this.focus];
+				this.current = JSON.parse(JSON.stringify(this.shops[this.focus]));
 				this.type = 'edit';
-				this.$refs.edit.open('edit');
+				this.$refs.edit.open(index);
 			},
 			remove () {
 				if(this.shops.length != 0){
@@ -489,7 +499,7 @@
 								border-right: 0;
 								cursor: pointer;
 								float: left;
-								padding: 0 10px;
+								width: 100px;
 							}
 							&>input{
 								width: 450px;

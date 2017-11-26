@@ -8,8 +8,10 @@ import Loading from '@/components/common/Loading';
 import Warn from '@/components/common/Warn';
 import Dialog from '@/components/common/Dialog';
 import ajax from '../static/js/ajax.js';
+import compareJson from '../static/js/compareJson.js';
 
 Vue.prototype.$ajax = ajax;
+Vue.prototype.$compareJson = compareJson;
 
 Vue.component('my-loading',Loading);
 Vue.component('my-warn',Warn);
