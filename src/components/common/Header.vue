@@ -70,10 +70,6 @@
 					this.downed = false;
 			},
 			profile (e) {
-				if(!this.downed)
-					this.downed = true;
-				else
-					this.downed = false;
 				this.$router.push('/administrator');
 				this.$store.commit('UPDATE_CURRENTPAGE',3);
 			},
