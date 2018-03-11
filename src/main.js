@@ -18,6 +18,24 @@ Vue.component('my-warn',Warn);
 Vue.component('my-dialog',Dialog);
 Vue.config.productionTip = true;
 
+//[全局]进入前触发
+router.beforeEach((to, from, next) => {
+//	store.commit('TOGGLE_LOADING',true);
+	if(to.meta.requireProp){
+		if(window.localStorage.getItem('yw_token')){
+			next();
+		}else{
+			next({name: 'Login'});
+		}
+	}else{
+		next(); // 确保一定要调用 next()
+	}
+});
+//[全局]进入后触发
+router.afterEach((to, from) => {
+	store.commit('TOGGLE_LOADING',false);
+});
+
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
