@@ -31,9 +31,6 @@
 				data: {
 					token: localStorage.getItem("yw_token"),
 				},
-				complete (msg){
-					console.log(msg);
-				}
 			}).then( response => {
 				if(response.type == 'success')
 					that.adminName = response.name;

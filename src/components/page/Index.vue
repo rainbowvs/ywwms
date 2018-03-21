@@ -88,10 +88,8 @@
 					handle: 'get',
 					token: localStorage.getItem("yw_token"),
 				},
-				complete (msg){
-					console.log(msg);
-				}
 			}).then(response => {
+				console.log(response);
 				if(response.type == 'success'){
 					for(let i in response.tasks)
 						that.todos.push({id: response.tasks[i].id,content: response.tasks[i].content,cdate: response.tasks[i].cdate,focus: false});
@@ -113,10 +111,8 @@
 					handle: 'get',
 					receiver: localStorage.getItem("yw_token"),
 				},
-				complete (msg){
-					console.log(msg);
-				}
 			}).then(response => {
+				console.log(response);
 				if(response.type == 'success'){
 					for(let i in response.msgs)
 						that.msgs.push({id: response.msgs[i].id,title: response.msgs[i].title,content: response.msgs[i].content,receiver: response.msgs[i].receiver,sender: response.msgs[i].sender,cdate: response.msgs[i].cdate,checked: false});
@@ -157,9 +153,6 @@
 							content: that.task,
 							token: localStorage.getItem("yw_token"),
 						},
-						complete (msg){
-							console.log(msg);
-						}
 					}).then( response => {
 						if(response.type == 'success'){
 							console.log(response);
@@ -195,9 +188,6 @@
 						id: that.todos[that.focus].id,
 						token: localStorage.getItem("yw_token"),
 					},
-					complete (msg){
-						console.log(msg);
-					}
 				}).then(response => {
 					if(response.type == 'success'){
 						that.todos.splice(that.focus,1);
@@ -236,9 +226,6 @@
 							ids: arr_id.join(","),
 							token: localStorage.getItem("yw_token"),
 						},
-						complete (msg){
-							console.log(msg);
-						}
 					}).then(response => {
 						arr_id = [];
 						console.log(response);

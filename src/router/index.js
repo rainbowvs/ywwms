@@ -3,44 +3,61 @@ import Router from 'vue-router'
 
 Vue.use(Router)
 
-export default new Router({
+const router = new Router({
 //	mode: 'history',
   routes: [
     {
       path: '/',
-      component: resolve => require(['@/components/common/Home'], resolve),
+      component: () => import('@/components/common/Home'),
       children: [
      		{
           path:'',
           name: 'Index',
-          component: resolve => require(['@/components/page/Index'], resolve),
+          component: () => import('@/components/page/Index'),
+          meta: {
+		      	requireProp: true,
+		      },
         },
       	{
       		path: '/order',
 		      name: 'Order',
-		      component: resolve => require(['@/components/page/Order'], resolve),
+		      component: () => import('@/components/page/Order'),
+		      meta: {
+		      	requireProp: true,
+		      },
       	},
       	{
       		path: '/shop',
 		      name: 'Shop',
-		      component: resolve => require(['@/components/page/Shop'], resolve),
+		      component: () => import('@/components/page/Shop'),
+		      meta: {
+		      	requireProp: true,
+		      },
       	},
       	{
       		path: '/administrator',
 		      name: 'Administrator',
-		      component: resolve => require(['@/components/page/Administrator'], resolve),
+		      component: () => import('@/components/page/Administrator'),
+		      meta: {
+		      	requireProp: true,
+		      },
       	},
       	{
       		path: '/user',
 		      name: 'User',
-		      component: resolve => require(['@/components/page/User'], resolve),
+		      component: () => import('@/components/page/User'),
+		      meta: {
+		      	requireProp: true,
+		      },
       	},
-      ]
+      ],
     },
     {
 			path: '/login',
 	    name: 'Login',
-	    component: resolve => require(['@/components/page/Login'], resolve),
+	    component: () => import('@/components/page/Login'),
 		},
   ]
-})
+});
+
+export default router;

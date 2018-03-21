@@ -72,13 +72,8 @@
 						beforeSend () {
 							that.$store.commit('TOGGLE_LOADING',true);
 						},
-						complete (msg) {
-							that.$store.commit('TOGGLE_LOADING',false);
-							console.log(msg);
-						}
 					}).then(response => {
 						console.log(response);
-						that.$store.commit('TOGGLE_LOADING',false);
 						that.$store.commit('TOGGLE_WARNING',{
 							msg: response.msg,
 							visibility: true,
@@ -90,10 +85,12 @@
 									msg: '',
 									visibility: false,
 								});
-								that.$router.push({ path: '/', query: { token: response.token}});
+								that.$router.push({ path: '/'});
 							},1000);
 						}
+						that.$store.commit('TOGGLE_LOADING',false);
 					}).catch(status => {
+						that.$store.commit('TOGGLE_LOADING',false);
 						console.log(status);
 					});
 				}
