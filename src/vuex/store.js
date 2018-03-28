@@ -14,12 +14,13 @@ const state = {
 		visibility: false,
 	},
 	loading: false,
+	adminInfo: window.sessionStorage['adminInfo'] ? JSON.parse(window.sessionStorage['adminInfo']) : {},//用户信息
 };
 
 const mutations = {
 	UPDATE_CURRENTPAGE (state,index) {
 		state.currentPage = index;
-		window.localStorage.setItem('currentPage',index);
+		window.sessionStorage.setItem('currentPage',index);
 	},
 	TOGGLE_WARNING (state,opt) {
 		state.warnInfo['visibility'] = opt.visibility;
@@ -27,6 +28,14 @@ const mutations = {
 	},
 	TOGGLE_LOADING (state,bool) {
 		state.loading = bool;
+	},
+	SET_ADMININFO (state,obj) {
+		state['adminInfo'] = obj['adminInfo'];
+		window.sessionStorage.setItem('adminInfo',JSON.stringify(state.adminInfo));
+	},
+	DEL_ADMININFO (state,obj) {
+		state['adminInfo'] = {};
+		window.sessionStorage.setItem('adminInfo',JSON.stringify(state.adminInfo));
 	},
 };
 
