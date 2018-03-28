@@ -4,16 +4,9 @@
 		<div class="container">
 			<div class="logo"><i class="fa fa-cog fa-spin"></i></div>
 			<form v-on:submit.prevent="login($event)">
-				<input type="text" name="user" id="user" placeholder="User" v-model="user" autofocus/>
-				<label></label>
-				<input type="password" name="pwd" id="pwd" placeholder="Pwd" v-model="pwd" />
-				<label></label>
-				<!--<div>
-					<input type="text" name="code" id="code" v-model="code" placeholder="Code" />
-					<label></label>
-					<img :src="codeUrl" @click="toggle"/>
-				</div>-->
-				<input type="submit" value="login" />
+				<input type="text" name="phone" id="phone" placeholder="请输入11位手机号码" title="请输入11位手机号码" v-model="phone" autofocus/>
+				<input type="password" name="pwd" id="pwd" placeholder="请输入6~12位密码，至少包含1位字母和1位数字" title="请输入6~12位密码，至少包含1位字母和1位数字" v-model="pwd" />
+				<input type="submit" value="登录" />
 			</form>
 		</div>
 	</div>
@@ -23,77 +16,97 @@
 	export default{
 		data () {
 			return {
-				user: '',
+				phone: '',
 				pwd: '',
-				code: '',
 			}
 		},
-		mounted () {
-			
-		},
 		methods: {
-			validate () {
-				if(/and|or|\/|\'|\"|\;|\:|\?|\\|\s/g.test(this.user)){
-					return 'false';
+			checkPhone (phone) {
+				if(phone == ''){
+					this.$store.commit('TOGGLE_WARNING',{
+						msg: '请填写手机号码',
+						visibility: true,
+					});
+					return false;
+				}else if(/and|or|\/|\'|\"|\;|\:|\?|\\|\s/g.test(phone)){
+					this.$store.commit('TOGGLE_WARNING',{
+						msg: '手机不得包含敏感字符',
+						visibility: true,
+					});
+					return false;
+				}else if(!(/^1[3|4|5|8]\d{9}$/.test(phone))){
+					this.$store.commit('TOGGLE_WARNING',{
+						msg: '请输入正确的手机号码',
+						visibility: true,
+					});
+					return false;
 				}
+				return true;
+			},
+			checkPwd (pwd) {
+				if(pwd == ''){
+					this.$store.commit('TOGGLE_WARNING',{
+						msg: '请填写密码',
+						visibility: true,
+					});
+					return false;
+				}else if(/and|or|\/|\'|\"|\;|\:|\?|\\|\s/g.test(pwd)){
+					this.$store.commit('TOGGLE_WARNING',{
+						msg: '密码不得包含敏感字符',
+						visibility: true,
+					});
+					return false;
+				}else if(pwd.length < 6 || pwd.length > 16){
+					this.$store.commit('TOGGLE_WARNING',{
+						msg: '密码长度范围在6-16个字符',
+						visibility: true,
+					});
+					return false;
+				}
+				return true;
 			},
 			login (e) {
+				//点击登录按钮事件
 				let that = this;
-				if(that.user == '' || that.pwd == ''){
-					that.$store.commit('TOGGLE_WARNING',{
-						msg: '账号或密码不能为空',
-						visibility: true,
-					});
-				}else if(that.user.length < 6){
-					that.$store.commit('TOGGLE_WARNING',{
-						msg: '账号不得小于6位',
-						visibility: true,
-					});
-				}else if(that.pwd < 6){
-					that.$store.commit('TOGGLE_WARNING',{
-						msg: '密码不得小于6位',
-						visibility: true,
-					});
-				}else if(that.validate() == 'false'){
-					that.$store.commit('TOGGLE_WARNING',{
-						msg: '账号不能包含敏感字符',
-						visibility: true,
-					});
-				}else{
-					that.$ajax({
-						url: "http://rainbowvs.com/yuewang/ywwms/interface/login.php",
-						type: "post",
-						async: true,
-						overtime: 3000,
-						data: {
-							'user': that.user,
-							'pwd': that.pwd,
-						},
-						beforeSend () {
-							that.$store.commit('TOGGLE_LOADING',true);
-						},
-					}).then(response => {
-						console.log(response);
+				if(!(that.checkPhone(that.phone) && that.checkPwd(that.pwd)))
+					return false;
+				that.$ajax({
+					name: '登录',
+					url: window.reqUrl + 'ywms_login.php',
+					data: {
+						phone: that.phone,
+						pwd: that.pwd,
+					},
+					beforeSend () {
+						that.$store.commit('TOGGLE_LOADING',true);
+					}
+				}).then(res => {
+					if(res.type == 'success'){
 						that.$store.commit('TOGGLE_WARNING',{
-							msg: response.msg,
+							msg: res.msg,
 							visibility: true,
 						});
-						if(response.type == 'success'){
-							localStorage.setItem('yw_token',response.token);
-							setTimeout(() => {
-								that.$store.commit('TOGGLE_WARNING',{
-									msg: '',
-									visibility: false,
-								});
-								that.$router.push({ path: '/'});
-							},1000);
-						}
-						that.$store.commit('TOGGLE_LOADING',false);
-					}).catch(status => {
-						that.$store.commit('TOGGLE_LOADING',false);
-						console.log(status);
+						//存储用户信息
+						that.$store.commit('SET_ADMININFO',{
+							adminInfo: res.adminInfo,
+						});
+						setTimeout(() => {
+							that.$router.push({path: '/'});
+						},1000);
+					}else{
+						that.$store.commit('TOGGLE_WARNING',{
+							msg: res.msg,
+							visibility: true,
+						});
+					}
+					that.$store.commit('TOGGLE_LOADING',false);
+				}).catch(status => {
+					that.$store.commit('TOGGLE_LOADING',false);
+					that.$store.commit('TOGGLE_WARNING',{
+						msg: status,
+						visibility: true,
 					});
-				}
+				});
 			},
 		},
 	}
@@ -104,26 +117,14 @@
 		position: relative;
 		width: 100%;
 		height: 100%;
-		text-align: center;
 		background: url(../../../static/img/bg.jpg) no-repeat center center;
-		&>.mask{
-			position: absolute;
-			width: 100%;
-			height: 100%;
-			top: 0;
-			left: 0;
-			right: 0;
-			bottom: 0;
-			background: url(../../../static/img/bg.jpg) no-repeat center center;
-			filter: blur(20px);
-		}
+		display: table;
+		text-align: center;
+		vertical-align: middle;
 		&>.container{
-			display: flex;
-			flex-direction: column;
-			justify-content: center;
-			width: 100%;
-			height: 100%;
-			position: absolute;
+			display: table-cell;
+			vertical-align: middle;
+			text-align: center;
 			background-color: rgba(0,0,0,0.2);
 			&>.logo{
 				box-sizing: border-box;
@@ -144,7 +145,7 @@
 			&>form{
 				margin: 0 auto;
 				width: 500px;
-				&>#user,&>#pwd{
+				&>#phone,&>#pwd{
 					background: rgba(255,255,255,0.2);
 					margin: 30px auto;
 					display: block;
@@ -176,32 +177,26 @@
 						background: transparent;
 					}
 				}
-				&>div{
-					overflow: hidden;
-					margin-bottom: 30px;
-					&>#code{
-						width: 300px;
-						float: left;
-						background: rgba(255,255,255,0.2);
-						display: block;
-						height: 50px;
-						line-height: 50px;
-						padding: 0 20px;
-						box-sizing: border-box;
-						border-bottom: 1px solid #bfcbd9;
-						font-size: 20px;
-						color: #fff;
-						font-family: "microsoft yahei";
-					}
-					&>img{
-						cursor: pointer;
-						float: left;
-					}
+			}
+			&>button{
+				margin: 30px auto;
+				width: 500px;
+				height: 50px;
+				line-height: 50px;
+				transition: all 0.4s;
+				border: 1px solid #bfcbd9;
+				box-sizing: border-box;
+				cursor: pointer; 
+				&:hover{
+					color: #fff;
+					border-color: rgba(255,255,255,0.6);
+					background: transparent;
 				}
 			}
 		}
 	}
 	input::-webkit-input-placeholder{
 		color: #aaa;
+		font-size: 16px;
 	}
 </style>
