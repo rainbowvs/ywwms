@@ -19,8 +19,8 @@
 					{cn: 'fa fa-home',title: '首页',path: '/'},
 					{cn: 'fa fa-pencil-square-o',title: '订单',path: '/order'},
 					{cn: 'fa fa-shopping-bag',title: '商品',path: '/shop'},
-					{cn: 'fa fa-vcard',title: '管理员',path: '/administrator'},
 					{cn: 'fa fa-user',title: '用户',path: '/user'},
+					{cn: 'fa fa-vcard',title: '管理员',path: '/administrator'},
 				],
 			}
 		},
@@ -31,11 +31,16 @@
 		},
 		computed: {
 			current () {
-				let localData = window.localStorage.getItem('currentPage');
-		    	if(this.$store.state.currentPage===0 && localData){
-		    		this.$store.commit('UPDATE_CURRENTPAGE',localData);//同步操作
-		    	}
-		    	return this.$store.state.currentPage;
+				if(this.$route.name == 'Index')
+		    		return 0;
+		    	else if(this.$route.name == 'Order')
+		    		return 1;
+		    	else if(this.$route.name == 'Shop')
+		    		return 2;
+		    	else if(this.$route.name == 'User')
+		    		return 3;
+		    	else if(this.$route.name == 'Administrator')
+		    		return 4;
 			}
 		}
 	}
