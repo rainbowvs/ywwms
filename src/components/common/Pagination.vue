@@ -145,7 +145,6 @@
 		-webkit-user-select:none;
 		&>ul{
 			line-height: 31px;
-			position: fixed;
 			overflow: hidden;
 			&>li{
 				margin-left: -1px;
@@ -189,7 +188,9 @@
 				line-height: 33px;
 				float: left;
 				&>input{
-					line-height: 26px;
+					height: 33px;
+					line-height: 33px;
+					box-sizing: border-box;
 					border: 1px solid #dfe6ec;
 					text-align: center;
 					width: 50px;
