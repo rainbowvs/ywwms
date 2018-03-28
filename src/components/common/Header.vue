@@ -1,12 +1,11 @@
 <template>
 	<div class="header">
-		<h1><router-link to="/" @click.native="toggle"><i class="fa fa-window-restore"></i>后台管理系统</router-link></h1>
+		<h1><router-link to="/" @click.native="toggle"><i class="fa fa-window-restore"></i>越王移动商城后台管理系统</router-link></h1>
 		<div class="user">
 			<p>
-				欢迎您，管理员：<span id="adminName" @click="downing($event)">{{adminName}}</span>
+				欢迎您，<template v-if="$store.state.adminInfo.level == 7">超级</template>管理员：<span id="adminName" @click="downing($event)">{{$store.state.adminInfo.name}}</span>
 				<transition name="pull">
 					<ul v-show="downed">
-						<li @click="profile($event)"><i class="fa fa-folder-open"></i>个人</li>
 						<li @click="logout($event)"><i class="fa fa-sign-out"></i>退出</li>
 					</ul>
 				</transition>
@@ -25,33 +24,7 @@
 		},
 		created () {
 			let that = this;
-			that.$ajax({
-				url: "http://rainbowvs.com/yuewang/ywwms/interface/getAdminName.php",
-				overtime: 3000,
-				data: {
-					token: localStorage.getItem("yw_token"),
-				},
-			}).then( response => {
-				if(response.type == 'success')
-					that.adminName = response.name;
-				else if(response.type == "error"){
-					that.$store.commit('TOGGLE_WARNING',{
-						msg: response.msg,
-						visibility: true,
-					});
-					localStorage.removeItem("yw_token");
-					setTimeout(()=>{
-						that.$store.commit('TOGGLE_WARNING',{
-							msg: '',
-							visibility: false,
-						});
-						that.$router.push('/login');
-					},1000);
-				}
-					
-			}).catch( status => {
-				console.log(status);
-			})
+			
 		},
 		mounted () {
 			document.onclick = (e) => {
@@ -66,15 +39,9 @@
 				else
 					this.downed = false;
 			},
-			profile (e) {
-				this.$router.push('/administrator');
-				this.$store.commit('UPDATE_CURRENTPAGE',3);
-			},
 			logout (e) {
 				this.downed = false;
-				localStorage.removeItem("yw_token");
-				this.$store.commit('UPDATE_CURRENTPAGE',0);
-				localStorage.removeItem("currentPage");
+				window.sessionStorage.removeItem("currentPage");
 				this.$store.commit('TOGGLE_WARNING',{
 					msg: '退出成功',
 					visibility: true,
@@ -84,6 +51,7 @@
 						msg: '',
 						visibility: false,
 					});
+					this.$store.commit('DEL_ADMININFO');
 					this.$router.push('/login');
 				},1000);
 			},
@@ -134,7 +102,7 @@
 	    		}
 	    		&>ul{
 	    			position: absolute;
-	    			right: -30px;
+	    			right: 0px;
 	    			top: 66px;
 	    			border: 1px solid #324157;
 	    			&>li{
