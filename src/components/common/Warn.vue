@@ -45,9 +45,6 @@
 <style lang="scss" scoped>
 	.warn{
 		text-align: center;
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
 		width: 100%;
 		height: 100%;
 		background: rgba(0,0,0,.5);
@@ -58,18 +55,21 @@
 		right: 0;
 		bottom: 0;
 		&>.container{
-			margin: 0 auto;
 			width: 500px;
 			height: 400px;
+			top: 50%;
+			left: 50%;
+			margin-left: -250px;
+			margin-top: -200px;
 			background: rgba(255,255,255,.8);
 			box-sizing: border-box;
-			padding: 100px 50px;
-			position: relative;
+			padding: 0 50px;
+			position: absolute;
+			display: table;
+			text-align: center;
+			vertical-align: middle;
 			&>.header{
-				position: absolute;
-				left: 0;
-				right: 0;
-				top: 40px;
+				margin-top: 50px;
 			}
 			&>.body{
 				&>p{
@@ -78,10 +78,6 @@
 				}
 			}
 			&>.footer{
-				position: absolute;
-				left: 0;
-				right: 0;
-				bottom: 40px;
 				text-align: center;
 				&>#close{
 					cursor: pointer;

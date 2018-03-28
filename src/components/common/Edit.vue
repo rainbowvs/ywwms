@@ -1,6 +1,7 @@
 <template>
 	<transition name="fade">
 		<div class="edit" v-show="visible">
+			<div class="mask"></div>
 			<div class="container">
 				<div class="header">
 					<slot name="header"></slot>
@@ -43,42 +44,56 @@
 <style lang="scss" scoped>
 	.edit{
 		text-align: center;
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		width: 100%;
-		height: 100%;
-		background: rgba(0,0,0,.5);
 		position: fixed;
 		z-index: 1000;
-		left: 0;
-		top: 0;
-		right: 0;
-		bottom: 0;
+		top: 50%;
+		left: 50%;
+		margin-left: -325px;
+		margin-top: -377px;
+		width: 680px;
+		height: 754px;
+		display: table;
+		text-align: center;
+		vertical-align: middle;
+		&>.mask{
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background: rgba(0,0,0,.5);
+			z-index: -1;
+		}
 		&>.container{
-			margin: 0 auto;
-			background: #fff;
-			display: flex;
-			flex-direction: column;
-			justify-content: center;
+			display: table-cell;
+			text-align: center;
+			vertical-align: middle;
 			&>.header{
 				padding: 20px 0;
+				background-color: #fff;
 			}
 			&>.body{
+				max-height: 600px;
 				padding: 0 50px;
+				overflow-y: auto;
+				overflow-x: hidden;
+				background-color: #fff;
 			}
 			&>.footer{
-				padding: 20px 0;
-				display: flex;
-				flex-direction: row;
-				justify-content: space-around;
+				padding: 10px 0;
+				overflow: hidden;
+				background-color: #fff;
 				&>#no{
+					width: 50%;
+					float: left;
 					cursor: pointer;
 					&:hover{
 						color: darkred;
 					}
 				}
 				&>#ok{
+					width: 50%;
+					float: left;
 					cursor: pointer;
 					&:hover{
 						color: green;

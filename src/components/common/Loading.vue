@@ -25,9 +25,6 @@
 
 <style lang="scss" scoped>
 	.loading{
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
 		z-index: 10000;
 		width: 100%;
 		height: 100%;
@@ -38,16 +35,22 @@
 		bottom: 0;
 		background-color: rgba(0,0,0,.5);
 		&>.container{
-			display: flex;
-			flex-direction: column;
-			justify-content: center;
-			margin: 0 auto;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			margin-left: -100px;
+			margin-top: -100px;
+			display: table;
+			text-align: center;
+			vertical-align: middle;
 			width: 200px;
 			height: 200px;
 			line-height: 200px;
 			background-color: rgba(255,255,255,.8);
 			&>i{
-				display: block;
+				display: table-cell;
+				text-align: center;
+				vertical-align: middle;
 				margin: 0 auto;
 			}
 		}

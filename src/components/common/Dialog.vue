@@ -28,7 +28,6 @@
 		methods: {
 			close () {
 				this.visibility = false;
-				this.msg = '';
 			},
 			open (msg) {
 				this.visibility = true;
@@ -44,10 +43,6 @@
 
 <style lang="scss" scoped>
 	.dialog{
-		text-align: center;
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
 		width: 100%;
 		height: 100%;
 		background: rgba(0,0,0,.5);
@@ -58,18 +53,21 @@
 		right: 0;
 		bottom: 0;
 		&>.container{
-			margin: 0 auto;
 			width: 500px;
 			height: 400px;
+			top: 50%;
+			left: 50%;
+			margin-left: -250px;
+			margin-top: -200px;
 			background: rgba(255,255,255,.8);
 			box-sizing: border-box;
-			padding: 100px 50px;
-			position: relative;
+			padding: 0 50px;
+			position: absolute;
+			display: table;
+			text-align: center;
+			vertical-align: middle;
 			&>.header{
-				position: absolute;
-				left: 0;
-				right: 0;
-				top: 40px;
+				margin-top: 50px;
 			}
 			&>.body{
 				&>p{
@@ -78,20 +76,18 @@
 				}
 			}
 			&>.footer{
-				position: absolute;
-				left: 0;
-				right: 0;
-				bottom: 40px;
-				display: flex;
-				flex-direction: row;
-				justify-content: space-around;
+				overflow: hidden;
 				&>#no{
+					width: 50%;
+					float: left;
 					cursor: pointer;
 					&:hover{
 						color: darkred;
 					}
 				}
 				&>#ok{
+					width: 50%;
+					float: left;
 					cursor: pointer;
 					&:hover{
 						color: green;
