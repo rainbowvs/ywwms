@@ -3,356 +3,255 @@
 		<h2>首页</h2>
 		<div class="container">
 			<div class="fit">
-				<div class="taskList">
-					<h2>任务列表</h2>
-					<hr />
-					<input type="text" name="task" id="task" v-model="task" placeholder="回车添加任务" @keyup.enter="addTodo($event)" />
-					<ul>
-						<template v-if="todos.length==0">
-							<h6>暂时没有设定任务</h6>
-						</template>
-						<template v-else>
-							<li v-for="todo,index in todos">
-								{{todo.content}}
-								<i class="fa fa-minus-circle" @click="removeCtd($event,index)"></i>
-							</li>
-						</template>
-					</ul>
-				</div>
+				<table>
+					<tbody>
+						<tr>
+							<th colspan="4">管理系统介绍</th>
+						</tr>
+						<tr>
+							<th rowspan="5">模块</th>
+							<th>提示</th>
+							<td colspan="3">点击编辑按钮后鼠标悬停于输入框上会出现输入提示</td>
+						</tr>
+						<tr>
+							<th>订单</th>
+							<td colspan="2">普通管理员有管理权限，可对订单【改、删】操作</td>
+						</tr>
+						<tr>
+							<th>商品</th>
+							<td colspan="2">普通管理员有管理权限，可对商品【增、改、删】操作</td>
+						</tr>
+						<tr>
+							<th>用户</th>
+							<td colspan="2">普通管理员有管理权限，可对用户【增、改、删】操作</td>
+						</tr>
+						<tr>
+							<th>管理员</th>
+							<td>超级管理员才有管理权限，可对管理员【增、改、删】操作</td>
+							<td>如果对正在登录的管理员账号进行权限操作必须重新登录才能进行后续操作</td>
+						</tr>
+					</tbody>
+				</table>
 			</div>
-			<div class="fit" :style="{width: '493px',height: '493px'}">
-				<div class="myCharts" :style="{width: '453px',height: '453px'}"></div>
-			</div> 
 			<div class="fit">
-				<div class="message">
-					<h2>信息列表</h2>
-					<hr />
-					<table>
-						<tbody>
-							<tr>
-								<th>选择</th>
-								<th>发送人</th>
-								<th>标题</th>
-								<th>内容</th>
-								<th>时间</th>
-							</tr>
-							<template v-if="msgs.length==0">
-								<tr>
-									<td colspan="5">暂时没有找到信息</td>
-								</tr>
-							</template>
-							<template v-else>
-								<tr v-for="msg,index in msgs">
-									<td><input type="checkbox" v-model="msg.checked" /></td>
-									<td>{{msg.sender}}</td>
-									<td>{{msg.title}}</td>
-									<td>{{msg.content}}</td>
-									<td>{{msg.cdate}}</td>
-								</tr>
-							</template>
-							<tr>
-								<td><input type="checkbox" v-model="checkedAll" /></td>
-								<td><button @click="removeCm">删除</button></td>
-								<td colspan="3"></td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
+				<table>
+					<tbody>
+						<tr>
+							<th colspan="2">登录管理员信息</th>
+						</tr>
+						<tr>
+							<th>编号</th>
+							<td v-text="$store.state.adminInfo.id"></td>
+						</tr>
+						<tr>
+							<th>管理员</th>
+							<td v-text="$store.state.adminInfo.name"></td>
+						</tr>
+						<tr>
+							<th>等级</th>
+							<td v-text="$store.state.adminInfo.level"></td>
+						</tr>
+						<tr>
+							<th>账号</th>
+							<td v-text="$store.state.adminInfo.phone"></td>
+						</tr>
+						<tr>
+							<th>最后登录时间</th>
+							<td v-text="$store.state.adminInfo.l_date"></td>
+						</tr>
+						<tr>
+							<th>注册时间</th>
+							<td v-text="$store.state.adminInfo.r_date"></td>
+						</tr>
+						<tr>
+							<th>操作</th>
+							<td>
+								<button @click="edit('updateName')">编辑名字</button>
+								<button @click="edit('updatePwd')">编辑密码</button>
+							</td>
+						</tr>
+					</tbody>
+				</table>
 			</div>
 		</div>
-		<my-dialog ref="dialog" @sure="dOk"></my-dialog>
+		<my-edit ref="edit" @sure="eOk">
+			<h1 slot="header">修改个人资料</h1>
+			<form slot="body">
+				<ul>
+					<li v-if="type=='updateName'">
+						<label for="name">昵称</label>
+						<input type="text" id="name" v-model="current.name" title="20位字符以内" placeholder="20位字符以内" />
+					</li>
+					<li v-if="type=='updatePwd'">
+						<label for="pwd">旧密码</label>
+						<input type="password" id="pwd" v-model="pwd" title="长度6~12，至少包含一位字母和一位数字" placeholder="长度6~12，至少包含一位字母和一位数字" />
+					</li>
+					<li v-if="type=='updatePwd'">
+						<label for="newPwd">新密码</label>
+						<input type="password" id="newPwd" v-model="newPwd" title="长度6~12，至少包含一位字母和一位数字" placeholder="长度6~12，至少包含一位字母和一位数字" />
+					</li>
+				</ul>
+			</form>
+		</my-edit>
 	</div>
 </template>
 
 <script>
-	import echarts from 'echarts';
 	export default{
 		data () {
 			return {
-				chart: null,
-				focus: null,
-				eventType: null,
-				returnValue: null,
-				msgs: [],
-				todos: [],
-				task: '',
+				type: 'updateName',
+				current: {},
+				pwd: '',
+				newPwd: '',
 			}
 		},
 		created () {
 			let that = this;
-			//拉取任务列表
-			that.$ajax({
-				url: "http://rainbowvs.com/yuewang/ywwms/interface/adminTask.php",
-				overtime: 3000,
-				data: {
-					handle: 'get',
-					token: localStorage.getItem("yw_token"),
-				},
-			}).then(response => {
-				console.log(response);
-				if(response.type == 'success'){
-					for(let i in response.tasks)
-						that.todos.push({id: response.tasks[i].id,content: response.tasks[i].content,cdate: response.tasks[i].cdate,focus: false});
-				}else if(response.type == "error"){
-					that.$store.commit('TOGGLE_WARNING',{
-						msg: response.msg,
-						visibility: true,
-					});
-				}
-//				console.log(that.todos);
-			}).catch(status => {
-				console.log(status);
-			});
-			//拉取信息列表
-			that.$ajax({
-				url: "http://rainbowvs.com/yuewang/ywwms/interface/adminMsg.php",
-				overtime: 3000,
-				data: {
-					handle: 'get',
-					receiver: localStorage.getItem("yw_token"),
-				},
-			}).then(response => {
-				console.log(response);
-				if(response.type == 'success'){
-					for(let i in response.msgs)
-						that.msgs.push({id: response.msgs[i].id,title: response.msgs[i].title,content: response.msgs[i].content,receiver: response.msgs[i].receiver,sender: response.msgs[i].sender,cdate: response.msgs[i].cdate,checked: false});
-				}else if(response.type == "error"){
-					that.$store.commit('TOGGLE_WARNING',{
-						msg: response.msg,
-						visibility: true,
-					});
-				}
-			}).catch(status => {
-				console.log(status);
-			});
 		},
 		methods: {
-			addTodo (e) {
-				if(this.task == ''){
-					this.$store.commit('TOGGLE_WARNING',{
-						msg: '任务不能为空',
-						visibility: true,
-					});
-				}else if(this.todos.length == 10){
-					this.$store.commit('TOGGLE_WARNING',{
-						msg: '最多只能同时存在10个任务',
-						visibility: true,
-					});
-				}else if(this.todos.find((item) => item.content == this.task)){
-					this.$store.commit('TOGGLE_WARNING',{
-						msg: '已有相同的任务',
-						visibility: true,
-					});
-				}else{
-					let that = this;
-					that.$ajax({
-						url: "http://rainbowvs.com/yuewang/ywwms/interface/adminTask.php",
-						overtime: 3000,
-						data: {
-							handle: 'add',
-							content: that.task,
-							token: localStorage.getItem("yw_token"),
-						},
-					}).then( response => {
-						if(response.type == 'success'){
-							console.log(response);
-							that.todos.push({id: response.task.id,content: response.task.content,cdate: response.task.cdate,focus: false});
-							that.$store.commit('TOGGLE_WARNING',{
-								msg: response.msg,
-								visibility: true,
-							});
-							that.task = '';
-						}else if(response.type == "error"){
-							that.$store.commit('TOGGLE_WARNING',{
-								msg: response.msg,
-								visibility: true,
-							});
-						}
-					}).catch( status => {
-						console.log(status);
-					})
-				}
-			},
-			removeCtd (e,index) {
-				this.eventType = 'removeTodo';
-				this.$refs.dialog.open('确认要删除选中的任务?');
-				this.focus = index;
-			},
-			removeTodo (value) {
+			eOk () {
 				let that = this;
+				if(that.type == 'updateName'){
+					if(!(that.checkName(that.current.name)))
+						return false;
+				}else if(that.type == 'updatePwd'){
+					if(!(that.checkPwd(that.pwd) && that.checkNewPwd(that.newPwd)))
+						return false;
+				}
+				//提交修改订单信息
 				that.$ajax({
-					url: "http://rainbowvs.com/yuewang/ywwms/interface/adminTask.php",
-					overtime: 3000,
+					name: '修改个人资料',
+					url: window.reqUrl + 'ywms_admin.php',
 					data: {
-						handle: 'del',
-						id: that.todos[that.focus].id,
-						token: localStorage.getItem("yw_token"),
+						handle: that.type,
+						uid: that.$store.state.adminInfo['id'],
+						token: that.$store.state.adminInfo['token'],
+						id: that.current.id,
+						phone: that.current.phone,
+						name: that.current.name,
+						pwd: that.pwd,
+						newPwd: that.newPwd,
 					},
-				}).then(response => {
-					if(response.type == 'success'){
-						that.todos.splice(that.focus,1);
-						this.$refs.dialog.close();
-						that.focus = null;
-					}else if(response.type == "error"){
-						//
+					beforeSend () {
+						that.$store.commit('TOGGLE_LOADING',true);
 					}
-					that.$store.commit('TOGGLE_WARNING',{
-						msg: response.msg,
-						visibility: true,
-					});
-				}).catch(status => {
-					console.log(status);
-				});
-			},
-			removeCm () {
-				if(this.msgs.length != 0){
-					this.eventType = 'removeMsg';
-					this.$refs.dialog.open('确认要删除选中的信息?');
-				}
-			},
-			removeMsg (value) {
-				let that = this;
-				let arr_id = [];
-				that.msgs.forEach((item) => {
-					if(item.checked)
-						arr_id.push(item.id);
-				});
-				if(arr_id.length != 0){
-					that.$ajax({
-						url: "http://rainbowvs.com/yuewang/ywwms/interface/adminMsg.php",
-						overtime: 3000,
-						data: {
-							handle: 'del',
-							ids: arr_id.join(","),
-							token: localStorage.getItem("yw_token"),
-						},
-					}).then(response => {
-						arr_id = [];
-						console.log(response);
-						if(response.type == 'success'){
-							let temp = [];
-							that.msgs.forEach((item) => {
-								if(!item.checked)
-									temp.push(item);
-							});
-							that.msgs = temp;
-							that.$refs.dialog.close();
-						}else if(response.type == "error"){
-							//
-						}
+				}).then(res => {
+					if(res.type == 'success'){
+						that.$store.commit('SET_ADMININFO',{
+							adminInfo: res.adminInfo,
+						});
 						that.$store.commit('TOGGLE_WARNING',{
-							msg: response.msg,
+							msg: res.msg,
 							visibility: true,
 						});
-					}).catch(status => {
-						console.log(status);
-					});
-				}else{
-					that.$refs.dialog.close();
+						that.$refs.edit.close();
+					}else{
+						if(res.status == 1)
+							setTimeout(() => {
+								that.$store.commit('DEL_ADMININFO');
+								that.$router.push({name: 'Login'});
+							},1000);
+						that.$store.commit('TOGGLE_WARNING',{
+							msg: res.msg,
+							visibility: true,
+						});
+					}
+					that.$store.commit('TOGGLE_LOADING',false);
+				}).catch(status => {
+					that.$store.commit('TOGGLE_LOADING',false);
 					that.$store.commit('TOGGLE_WARNING',{
-						msg: '没有选中任何信息',
+						msg: status,
 						visibility: true,
 					});
-				}
+				});
 			},
-			dOk (e) {
-				if(this.eventType == 'removeTodo')
-					this.removeTodo();
-				else if(this.eventType == 'removeMsg')
-					this.removeMsg();
-			}
-		},
-		mounted () {
-			// 引入基本模板
-			let echarts = require('echarts/lib/echarts');
-			// 引入饼图组件
-			require('echarts/lib/chart/pie');
-			// 引入提示框和图例组件
-			require('echarts/lib/component/tooltip');
-			require('echarts/lib/component/legend');
-			this.chart = echarts.init(document.getElementsByClassName("myCharts")[0]);
-			this.chart.setOption({
-			    title: {
-			        text: '用户分布',
-			        left: 'center',
-			        textStyle: {
-			        	fontSize: 30
-			        },
-		        	padding: [
-			            0,  // 上
-			            0, // 右
-			            0,  // 下
-			            0, // 左
-			        ],
-			    },
-			    tooltip : {
-			        trigger: 'item',
-			        formatter: "{a} <br/>{b} : {c} ({d}%)"
-			    },
-			    series : [
-			        {
-			            name: '访问来源',
-			            type: 'pie',
-			            radius : '70%',
-			            center: ['50%', '50%'],
-			            data:[
-			                {value:335, name:'北京'},
-			                {value:310, name:'上海'},
-			                {value:274, name:'广州'},
-			                {value:235, name:'天津'},
-			                {value:400, name:'深圳'}
-			            ].sort(function (a, b) { return a.value - b.value; }),
-			            label: {
-			                normal: {
-			                    textStyle: {
-			                        fontSize: 20
-			                    }
-			                }
-			            },
-			            labelLine: {
-			            	normal: {
-			            		length: 5,
-			            		length2: 10,
-			            	}
-			            },
-			            roseType: 'radius',
-			            animationType: 'scale',
-			            animationEasing: 'elasticOut',
-			            animationDelay: function (idx) {
-			                return Math.random() * 200;
-			            }
-			        }
-			    ]
-			});
-		},
-		computed: {
-			checkedAll: {
-				get () {
-					if(this.checkedCount == this.msgs.length){
-						if(this.checkedCount == 0)
-							return false;
-						else
-							return true;
-					}
+			edit (type) {
+				this.type = type;
+				this.current = JSON.parse(JSON.stringify(this.$store.state.adminInfo));
+				this.$refs.edit.open();
+			},
+			checkPwd (pwd) {
+				if(pwd == ''){
+					this.$store.commit('TOGGLE_WARNING',{
+						msg: '请填写旧密码',
+						visibility: true,
+					});
 					return false;
-				},
-				set (value) {
-					this.msgs.forEach((item) => {
-						item.checked = value;
+				}else if(/and|or|\/|\'|\"|\;|\:|\?|\\|\s/g.test(pwd)){
+					this.$store.commit('TOGGLE_WARNING',{
+						msg: '旧密码不得包含敏感字符',
+						visibility: true,
 					});
-					return value;
+					return false;
+				}else if(!(/(?=.*\d)(?=.*[a-z])/g.test(pwd))){
+					this.$store.commit('TOGGLE_WARNING',{
+						msg: '旧密码至少包含一个字母和一个数字',
+						visibility: true,
+					});
+					return false;
+				}else if(pwd.length < 6 || pwd.length > 12){
+					this.$store.commit('TOGGLE_WARNING',{
+						msg: '旧密码长度范围在6-12个字符',
+						visibility: true,
+					});
+					return false;
 				}
+				return true;
 			},
-			checkedCount: {
-				get () {
-					let count = 0;
-					this.msgs.forEach((item) => {
-						if(item.checked)
-							count++;
+			checkNewPwd (pwd) {
+				if(pwd == ''){
+					this.$store.commit('TOGGLE_WARNING',{
+						msg: '请填写新密码',
+						visibility: true,
 					});
-					return count;
+					return false;
+				}else if(/and|or|\/|\'|\"|\;|\:|\?|\\|\s/g.test(pwd)){
+					this.$store.commit('TOGGLE_WARNING',{
+						msg: '新密码不得包含敏感字符',
+						visibility: true,
+					});
+					return false;
+				}else if(!(/(?=.*\d)(?=.*[a-z])/g.test(pwd))){
+					this.$store.commit('TOGGLE_WARNING',{
+						msg: '新密码至少包含一个字母和一个数字',
+						visibility: true,
+					});
+					return false;
+				}else if(pwd.length < 6 || pwd.length > 12){
+					this.$store.commit('TOGGLE_WARNING',{
+						msg: '新密码长度范围在6-12个字符',
+						visibility: true,
+					});
+					return false;
 				}
-			}
+				return true;
+			},
+			checkName (name) {
+				if(name == ''){
+					this.$store.commit('TOGGLE_WARNING',{
+						msg: '请填写昵称',
+						visibility: true,
+					});
+					return false;
+				}else if(/and|or|\/|\'|\"|\;|\:|\?|\\|\s/g.test(name)){
+					this.$store.commit('TOGGLE_WARNING',{
+						msg: '昵称不得包含敏感字符',
+						visibility: true,
+					});
+					return false;
+				}else if(name.length >= 20){
+					this.$store.commit('TOGGLE_WARNING',{
+						msg: '昵称长度不得超过20个字符',
+						visibility: true,
+					});
+					return false;
+				}
+				return true;
+			},
+		},
+		components: {
+			'my-edit': () => import('@/components/common/Edit'),//webpack2官网推荐使用, 属于es7范畴, 需要配合babel的syntax-dynamic-import插件使用,
 		},
 	}
 </script>
@@ -360,151 +259,115 @@
 <style lang="scss" scoped>
 	.index{
 		width: 100%;
+		height: 90%;
 		&>h2{
 			border-left: 4px solid #324157;
 			padding-left: 10px;
 			margin-bottom: 20px;
 		}
-		.container{
+		&>.container{
+			width: 100%;
+			height: 100%;
 			&>.fit{
-				float: left;
+				width: 100%;
 				border: 1px solid #d1dbe5;
 			    border-radius: 4px;
 			    background-color: #fff;
-			    overflow: hidden;
 			    box-shadow: 0 2px 4px 0 rgba(0,0,0,.12), 0 0 6px 0 rgba(0,0,0,.04);
 			    box-sizing: border-box;
 			    padding: 20px;
-			    margin-right: 50px;
 			    margin-bottom: 50px;
-				&>.myCharts{
-					
-				}
-				&>.taskList{
-					height: 451px;
-					&>hr{
-						height: 1px;
-					    border: none;
-					    border-top: 1px dashed #ccc;
-					    margin-bottom: 5px;
-					    margin-top: 5px;
-					}
-					&>input{
-						box-sizing: border-box;
+				&>table{
+					width: 100%;
+					text-align: center;
+					vertical-align: middle;
+					border-collapse: collapse;
+					&>tbody{
 						width: 100%;
-						border-radius: 5px;
-						line-height: 20px;
-						font-size: 16px;
-						border: 1px solid #ccc;
-						margin-bottom: 5px;
-						padding: 5px 12px;
-						&:focus{
-							border-color: #20A0FF;
-							box-shadow: 0 0 2px #ccc;
-						}
-					}
-					&>ul{
-						width: 300px;
-						border-top: 1px solid #ccc;
-						border-right: 1px solid #ccc;
-						border-radius: 5px;
-						overflow: hidden;
-						&>h6{
-							font-size: 16px;
-							text-align: center;
-							line-height: 20px;
-						    padding: 8px;
-						    border-left: 1px solid #ccc;
-						    border-bottom: 1px solid #ccc;
-						}
-						&>li{
-							position: relative;
-							transition: all 0.4s;
-							border-left: 5px solid #209e91;
-						    line-height: 20px;
-						    padding: 8px;
-						    border-bottom: 1px solid #ccc;
-						    cursor: pointer;
-						    overflow: hidden;
+						&>tr{
 							&:hover{
-								border-left: 30px solid #209e91;
-	    						background-color: #eee;
-	    						&>i{
-	    							right: 5px;
-	    						}
-    						}
-    						&>i{
-    							transition: all 0.4s;
-    							margin-right: 10px;
-    							right: -30px;
-    							top: 0;
-    							line-height: 37px;
-    							cursor: pointer;
-    							position: absolute;
-    							font-size: 20px;
-    							color: red;
-    							background-color: transparent;
-    						}
+								background-color: #eef1f6;;
+							}
+							&>th{
+								padding: 0 10px;
+								height: 40px;
+								background-color: #eef1f6;
+								color: #000;
+								border: 1px solid #dfe6ec;
+							}
+							&>td{
+								padding: 0 20px;
+								height: 40px;
+								border: 1px solid #dfe6ec;
+								&>input[type=text]{
+									text-align: center;
+									width: 100%;
+									font-family: "microsoft yahei";
+									font-size: 14px;
+									background-color: transparent;
+									border-bottom: 1px solid #20a0ff;
+									&:focus{
+										color: #20a0ff;
+									}
+								}
+								&>button{
+									padding: 5px 10px;
+									cursor: pointer;
+									background-color: #324157;
+									color: #bfcbd9;;
+									&:hover{
+										background-color: #48576a;
+									}
+									&:active{
+										color: #20a0ff;
+									}
+								}
+							}
 						}
 					}
 				}
-				&>.message{
-					&>hr{
-						height: 1px;
-					    border: none;
-					    border-top: 1px dashed #ccc;
-					    margin-bottom: 5px;
-					    margin-top: 5px;
-					}
-					&>table{
-						white-space: nowrap;
-						width: 100%;
-						text-align: center;
-						vertical-align: middle;
-						border-collapse: collapse;
-						&>tbody{
-							&>tr{
-								&:hover{
-									background-color: #eef1f6;;
-								}
-								&>th{
-									height: 40px;
-									background-color: #eef1f6;
-									color: #000;
-									border: 1px solid #dfe6ec;
-									&:nth-child(1){
-										width: 50px;
-									}
-								}
-								&>td{
-									padding: 0 30px;
-									height: 40px;
-									border: 1px solid #dfe6ec;
-									&>input[type=text]{
-										text-align: center;
-										width: 100%;
-										font-family: "microsoft yahei";
-										font-size: 14px;
-										background-color: transparent;
-										border-bottom: 1px solid #20a0ff;
-										&:focus{
-											color: #20a0ff;
-										}
-									}
-									&>button{
-										width: 50px;
-										height: 30px;
-										cursor: pointer;
-										background-color: #324157;
-										color: #bfcbd9;;
-										&:hover{
-											background-color: #48576a;
-										}
-										&:active{
-											color: #20a0ff;
-										}
-									}
-								}
+			}
+		}
+		&>.edit{
+			.header{
+				
+			}
+			.body{
+				max-height: 500px;
+				overflow-y: auto;
+				&>form{
+					&>ul{
+						min-width: 550px;
+						&>li{
+							margin: 8px auto;
+							line-height: 40px;
+							overflow: hidden;
+							&>label{
+								line-height: 38px;
+								box-sizing: border-box;
+								border: 1px solid #d8dce5;
+								border-right: 0;
+								cursor: pointer;
+								float: left;
+								width: 100px;
+							}
+							&>input{
+								width: 450px;
+								float: left;
+							    background-color: #fff;
+							    border: 1px solid #d8dce5;
+							    box-sizing: border-box;
+							    color: #000;
+							    display: inline-block;
+							    height: 40px;
+							    line-height: 1;
+							    outline: none;
+							    padding: 0 15px;
+							    transition: border-color .2s cubic-bezier(.645,.045,.355,1);
+							    &:focus{
+							    	outline: none;
+    								border-color: #324157;
+							    }
 							}
 						}
 					}
